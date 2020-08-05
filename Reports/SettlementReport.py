@@ -1,21 +1,52 @@
+from DatabaseManagement.DatabaseManager import DatabaseManager
+
+
 class SettlementReport:
+    manager = DatabaseManager()
 
-    def generate_report_data(self, report_group, expenses_list):
-        users = {}
-
+    def get_data_from_db(self, account_id, date_from, date_to):
+        expenses_list = self.manager.get_all_expenses_between_dates(account_id, date_from, date_to)
+        report_data = []
         for expense in expenses_list:
-            payer_id = expense[0]
-            group = expense[1]
-            amount = expense[2]
-            settlement_id = expense[3]
+            group = self.manager.get_group(expense['group_id'])
+            settlement_rule_id = group['settlement_rule_id']
+            settlement_rule = self.manager.get_settlement_rule(settlement_rule_id)
+            settlement_type_id = None
+            if settlement_rule != {}:
+                settlement_type_id = settlement_rule['settlement_rule_id']
 
-            if settlement_id == 1:
-                to_settle = self.settle_by_percent(report_group, payer_id, group, amount)
+            settlement_rule_users = self.manager.get_settlement_rule_users(settlement_rule_id)
+            group_users = []
+            for user in settlement_rule_users:
+                group_users.append(
+                    (
+                        user['user_id'],
+                        user['amount'],
+                        user['priority']
+                    )
+                )
 
-            elif settlement_id == 2:
-                to_settle = self.settle_by_amount(report_group, payer_id, group, amount)
+            report_data.append( ##  DODAĆ OBSŁUGĘ REPORT GROUP
+                {
+                    'payer_id': expense['username'],
+                    'group': group_users,
+                    'amount': expense['amount'],
+                    'settlement_type_id': settlement_type_id
+                }
+            )
+        return report_data
+
+    def generate_report_data(self, account_id, report_group, date_from, date_to):
+        users = {}
+        report_data = self.get_data_from_db(account_id, date_from, date_to)
+        for row in report_data:
+            if row['settlement_type_id'] == 1:
+                to_settle = self.settle_by_percent(report_group, row['payer_id'], row['group'], row['amount'])
+
+            elif row['settlement_type_id'] == 2:
+                to_settle = self.settle_by_amount(report_group, row['payer_id'], row['group_id'], row['amount'])
             else:
-                raise
+                continue
             for k in to_settle:
                 if k in users:
                     for m in to_settle[k]:

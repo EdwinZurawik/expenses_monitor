@@ -1,6 +1,8 @@
 import mysql.connector
 # from mysql.connector import errorcode
 from ConfigurationData import ConfigurationData
+from datetime import datetime
+from datetime import date
 
 
 class DatabaseManager:
@@ -103,92 +105,372 @@ class DatabaseManager:
     # ----------------------------------------------- GET ------------------------------------------------------------ #
 
     def get_account(self, username, password):
-        result = self.__select_account(username, password)
+        data = self.__select_account(username, password)
+        result = {}
+        if data is not None:
+            result = {
+                'account_id': data[0],
+                'username': data[1],
+                'password': data[2],
+                'email': data[3]
+            }
         return result
 
     def get_all_users(self, account_id, order_by='username'):
-        results = self.__select_all_users(account_id, order_by)
+        data = self.__select_all_users(account_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'user_id': row[0],
+                    'username': row[1],
+                    'main_group_id': row[2],
+                    'account_id': row[3]
+                }
+            )
         return results
 
     def get_all_categories(self, account_id, order_by='name'):
-        results = self.__select_all_categories(account_id, order_by)
+        data = self.__select_all_categories(account_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'category_id': row[0],
+                    'name': row[1],
+                    'description': row[2],
+                    'category_type_id': row[3],
+                    'account_id': row[4]
+                }
+            )
         return results
 
     def get_all_groups(self, account_id, order_by='name'):
-        results = self.__select_all_groups(account_id, order_by)
+        data = self.__select_all_groups(account_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'group_id': row[0],
+                    'name': row[1],
+                    'description': row[2],
+                    'settlement_rule_id': row[3],
+                    'is_main_group': row[4],
+                    'account_id': row[5]
+                }
+            )
         return results
 
     def get_all_payment_methods(self, account_id, order_by='name'):
-        results = self.__select_all_payment_methods(account_id, order_by)
+        data = self.__select_all_payment_methods(account_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'payment_method_id': row[0],
+                    'name': row[1],
+                    'account_id': row[2]
+                }
+            )
         return results
 
     def get_all_category_types(self, order_by='name'):
-        results = self.__select_all_category_types(order_by)
+        data = self.__select_all_category_types(order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'name': row[0],
+                    'description': row[1]
+                }
+            )
         return results
 
     def get_all_settlement_types(self, order_by='name'):
-        results = self.__select_all_settlement_types(order_by)
+        data = self.__select_all_settlement_types(order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'settlement_type_id': row[0],
+                    'name': row[1],
+                    'description': row[2]
+                }
+            )
         return results
 
     def get_all_settlement_rules(self, account_id, order_by='name'):
-        results = self.__select_all_settlement_rules(account_id, order_by)
+        data = self.__select_all_settlement_rules(account_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'settlement_rule_id': row[0],
+                    'name': row[1],
+                    'description': row[2],
+                    'settlement_type_id': row[3],
+                    'account_id': row[4]
+                }
+            )
         return results
 
     def get_all_expenses(self, account_id, order_by='e.operationDate, c.name, e.name'):
-        results = self.__select_all_expenses(account_id, order_by)
+        data = self.__select_all_expenses(account_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'expense_id': row[0],
+                    'operation_date': row[1],
+                    'amount': row[2],
+                    'expense_name': row[3],
+                    'username': row[4],
+                    'category_name': row[5],
+                    'payment_method_name': row[6],
+                    'group_name': row[7],
+                    'user_id': row[8],
+                    'category_id': row[9],
+                    'payment_method_id': row[10],
+                    'group_id': row[11]
+                }
+            )
+        return results
+
+    def get_all_expenses_between_dates(self, account_id, date_from=None,
+                                       date_to=None, order_by='e.operationDate, c.name, e.name'):
+        data = self.__select_all_expenses_between_dates(account_id, date_from, date_to, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'expense_id': row[0],
+                    'operation_date': row[1],
+                    'amount': row[2],
+                    'expense_name': row[3],
+                    'username': row[4],
+                    'category_name': row[5],
+                    'payment_method_name': row[6],
+                    'group_name': row[7],
+                    'user_id': row[8],
+                    'category_id': row[9],
+                    'payment_method_id': row[10],
+                    'group_id': row[11]
+                }
+            )
         return results
 
     def get_all_incomes(self, account_id, order_by='i.operationDate, c.name, i.name'):
-        results = self.__select_all_incomes(account_id, order_by)
+        data = self.__select_all_incomes(account_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'income_id': row[0],
+                    'operation_date': row[1],
+                    'amount': row[2],
+                    'income_name': row[3],
+                    'category_name': row[4],
+                    'group_name': row[5],
+                    'category_id': row[6],
+                    'group_id': row[7]
+                }
+            )
+        return results
+
+    def get_all_incomes_between_dates(self, account_id, date_from=None,
+                                      date_to=None, order_by='i.operationDate, c.name, i.name'):
+        data = self.__select_all_incomes_between_dates(account_id, date_from, date_to, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'income_id': row[0],
+                    'operation_date': row[1],
+                    'amount': row[2],
+                    'income_name': row[3],
+                    'category_name': row[4],
+                    'group_name': row[5],
+                    'category_id': row[6],
+                    'group_id': row[7]
+                }
+            )
+        return results
+
+    def get_settlement_rule_users(self, settlement_rule_id):
+        data = self.__select_settlement_rule_users(settlement_rule_id)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'settlement_rule_id': row[0],
+                    'user_id': row[1],
+                    'amount': row[2],
+                    'priority': row[3],
+                }
+            )
         return results
 
     def get_default_expense_category(self, account_id):
-        result = self.__select_default_expense_category(account_id)
+        data = self.__select_default_expense_category(account_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'category_id': data[0],
+                    'name': data[1],
+                    'description': data[2],
+                    'category_type_id': data[3],
+                    'account_id': data[4]
+                }
         return result
 
     def get_default_income_category(self, account_id):
-        result = self.__select_default_income_category(account_id)
+        data = self.__select_default_income_category(account_id)
+        result = {}
+        if data is not None:
+            result = {
+                'category_id': data[0],
+                'name': data[1],
+                'description': data[2],
+                'category_type_id': data[3],
+                'account_id': data[4]
+            }
         return result
 
     def get_users_default_group(self, user_id):
-        result = self.__select_users_default_group(user_id)
-
+        data = self.__select_users_default_group(user_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'group_id': data[0],
+                    'name': data[1],
+                    'description': data[2],
+                    'settlement_rule_id': data[3],
+                    'is_main_group': data[4],
+                    'account_id': data[5]
+                }
         return result
 
     def get_default_settlement_rule(self, account_id):
-        result = self.__select_default_settlement_rule(account_id)
+        data = self.__select_default_settlement_rule(account_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'settlement_rule_id': data[0],
+                    'name': data[1],
+                    'description': data[2],
+                    'settlement_type_id': data[3],
+                    'account_id': data[4]
+                }
         return result
 
     def get_default_payment_method(self, account_id):
-        result = self.__select_default_payment_method(account_id)
+        data = self.__select_default_payment_method(account_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'payment_method_id': data[0],
+                    'name': data[1],
+                    'account_id': data[2]
+                }
         return result
 
     def get_user(self, user_id):
-        result = self.__select_user(user_id)
+        data = self.__select_user(user_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'user_id': data[0],
+                    'username': data[1],
+                    'main_group_id': data[2],
+                    'account_id': data[3]
+                }
         return result
 
     def get_category(self, category_id):
-        result = self.__select_category(category_id)
+        data = self.__select_category(category_id)
+        result = {}
+        if data is not None:
+            result = {
+                'category_id': data[0],
+                'name': data[1],
+                'description': data[2],
+                'category_type_id': data[3],
+                'account_id': data[4]
+            }
         return result
 
     def get_group(self, group_id):
-        result = self.__select_group(group_id)
+        data = self.__select_group(group_id)
+        result = {}
+        if data is not None:
+            result = {
+                'group_id': data[0],
+                'name': data[1],
+                'description': data[2],
+                'settlement_rule_id': data[3],
+                'is_main_group': data[4],
+                'account_id': data[5]
+            }
         return result
 
     def get_payment_method(self, payment_method_id):
-        result = self.__select_payment_method(payment_method_id)
+        data = self.__select_payment_method(payment_method_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'payment_method_id': data[0],
+                    'name': data[1],
+                    'account_id': data[2]
+                }
         return result
 
     def get_settlement_rule(self, settlement_rule_id):
-        result = self.__select_settlement_rule(settlement_rule_id)
+        data = self.__select_settlement_rule(settlement_rule_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'settlement_rule_id': data[0],
+                    'name': data[1],
+                    'description': data[2],
+                    'settlement_type_id': data[3],
+                    'account_id': data[4]
+                }
         return result
 
     def get_expense(self, expense_id):
-        result = self.__select_expense(expense_id)
+        data = self.__select_expense(expense_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'expense_id': data[0],
+                    'operation_date': data[1],
+                    'amount': data[2],
+                    'expense_name': data[3],
+                    'username': data[4],
+                    'category_name': data[5],
+                    'payment_method_name': data[6],
+                    'group_name': data[7],
+                    'user_id': data[8],
+                    'category_id': data[9],
+                    'payment_method_id': data[10],
+                    'group_id': data[11]
+                }
         return result
 
     def get_income(self, income_id):
-        result = self.__select_income(income_id)
+        data = self.__select_income(income_id)
+        result = {}
+        if data is not None:
+            result = {
+                    'income_id': data[0],
+                    'operation_date': data[1],
+                    'amount': data[2],
+                    'income_name': data[3],
+                    'category_name': data[4],
+                    'group_name': data[5],
+                    'category_id': data[6],
+                    'group_id': data[7]
+                }
         return result
 
     # ------------------------------------------ INSERT QUERIES ------------------------------------------------------ #
@@ -494,7 +776,12 @@ class DatabaseManager:
     # -------------------------------------------- SELECT QUERIES ---------------------------------------------------- #
 
     def __select_account(self, username, password):
-        sql = ('SELECT * FROM account_tbl '
+        sql = ('SELECT '
+               'accountId, '
+               'username, '
+               'password, '
+               'email '
+               'FROM account_tbl '
                'WHERE '
                'username = %s '
                'AND password = %s')
@@ -509,7 +796,12 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_users(self, account_id, order_by='username'):
-        sql = ('SELECT * FROM user_tbl ' 
+        sql = ('SELECT '
+               'userId, '
+               'username, '
+               'mainGroupId, '
+               'accountId '
+               ' FROM user_tbl ' 
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -524,7 +816,13 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_categories(self, account_id, order_by='name'):
-        sql = ('SELECT * FROM category_tbl ' 
+        sql = ('SELECT '
+               'categoryId, '
+               'name, '
+               'description, '
+               'categoryTypeId, '
+               'accountId '
+               'FROM category_tbl ' 
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -539,7 +837,14 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_groups(self, account_id, order_by='name'):
-        sql = ('SELECT * FROM group_tbl ' 
+        sql = ('SELECT '
+               'groupId, '
+               'name, '
+               'description, '
+               'settlementRuleId, '
+               'isMainGroup, '
+               'accountId '
+               'FROM group_tbl ' 
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -554,7 +859,11 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_payment_methods(self, account_id, order_by='name'):
-        sql = ('SELECT * FROM payment_method_tbl ' 
+        sql = ('SELECT '
+               'paymentMethodId, '
+               'name, '
+               'accountId '
+               'FROM payment_method_tbl ' 
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -569,7 +878,10 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_category_types(self, order_by='name'):
-        sql = ('SELECT * FROM category_type_tbl ' 
+        sql = ('SELECT '
+               'name, '
+               'description '
+               'FROM category_type_tbl ' 
                f'ORDER BY {order_by}')
         try:
             self.connect_to_db()
@@ -582,7 +894,11 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_settlement_types(self, order_by='name'):
-        sql = ('SELECT * FROM settlement_type_tbl ' 
+        sql = ('SELECT '
+               'settlementTypeId, '
+               'name, '
+               'description, '
+               'FROM settlement_type_tbl ' 
                f'ORDER BY {order_by}')
         try:
             self.connect_to_db()
@@ -595,7 +911,13 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_settlement_rules(self, account_id, order_by='name'):
-        sql = ('SELECT * FROM settlement_rule_tbl ' 
+        sql = ('SELECT '
+               'settlementRuleId, '
+               'name, '
+               'description, '
+               'settlementTypeId, '
+               'accountId '
+               'FROM settlement_rule_tbl ' 
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -618,7 +940,11 @@ class DatabaseManager:
                'u.username, '
                'c.name, '
                'p.name, '
-               'g.name '
+               'g.name, '
+               'u.userId, '
+               'c.categoryId, '
+               'p.paymentMethodId, '
+               'g.groupId '
                'FROM expense_tbl e '
                'INNER JOIN user_tbl u '
                'ON e.payerId=u.userId '
@@ -641,6 +967,53 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
+    def __select_all_expenses_between_dates(self, account_id, date_from=None,
+                                            date_to=None, order_by='e.operationDate, c.name, e.name'):
+        if date_from is None:
+            date_from = datetime(1000, 1, 1)
+        else:
+            date_from = datetime.combine(date_from, datetime.min.time())
+        if date_to is None:
+            date_to = datetime(9999, 12, 31, 23, 59, 59)
+        else:
+            date_to = datetime.combine(date_to, datetime.max.time())
+
+        sql = ('SELECT '
+               'e.expenseId, '
+               'e.operationDate, '
+               'e.amount, '
+               'e.name, '
+               'u.username, '
+               'c.name, '
+               'p.name, '
+               'g.name, '
+               'u.userId, '
+               'c.categoryId, '
+               'p.paymentMethodId, '
+               'g.groupId '
+               'FROM expense_tbl e '
+               'INNER JOIN user_tbl u '
+               'ON e.payerId=u.userId '
+               'INNER JOIN category_tbl c '
+               'ON e.categoryId=c.categoryId '
+               'INNER JOIN payment_method_tbl p '
+               'ON e.paymentMethodId=p.paymentMethodId '
+               'INNER JOIN group_tbl g '
+               'ON e.groupId=g.groupId '
+               'WHERE '
+               'u.accountId=%s '
+               'AND e.operationDate BETWEEN %s and %s '
+               f'ORDER BY {order_by}')
+        try:
+            self.connect_to_db()
+            self.cursor.execute(sql, (account_id, date_from, date_to))
+            results = self.cursor.fetchall()
+            return results
+        except mysql.connector.Error as err:
+            print(err.msg)
+        finally:
+            self.close_connection()
+
     def __select_all_incomes(self, account_id, order_by='i.operationDate, c.name, i.name'):
         sql = ('SELECT '
                'i.incomeId, '
@@ -648,7 +1021,9 @@ class DatabaseManager:
                'i.amount, '
                'i.name, '
                'c.name, '
-               'g.name '
+               'g.name, '
+               'c.categoryId, '
+               'g.groupId '
                'FROM income_tbl i '
                'LEFT JOIN category_tbl c '
                'ON i.categoryId=c.categoryId '
@@ -667,12 +1042,78 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
+    def __select_all_incomes_between_dates(self, account_id, date_from=None,
+                                           date_to=None, order_by='i.operationDate, c.name, i.name'):
+        if date_from is None:
+            date_from = datetime(1000, 1, 1)
+        else:
+            date_from = datetime.combine(date_from, datetime.min.time())
+        if date_to is None:
+            date_to = datetime(9999, 12, 31, 23, 59, 59)
+        else:
+            date_to = datetime.combine(date_to, datetime.max.time())
+
+        sql = ('SELECT '
+               'i.incomeId, '
+               'i.operationDate, '
+               'i.amount, '
+               'i.name, '
+               'c.name, '
+               'g.name, '
+               'c.categoryId, '
+               'g.groupId '
+               'FROM income_tbl i '
+               'LEFT JOIN category_tbl c '
+               'ON i.categoryId=c.categoryId '
+               'LEFT JOIN group_tbl g '
+               'ON i.groupId=g.groupId '
+               'WHERE '
+               'g.accountId=%s '
+               'AND i.operationDate BETWEEN %s and %s '
+               f'ORDER BY {order_by}')
+        try:
+            self.connect_to_db()
+            self.cursor.execute(sql, (account_id, date_from, date_to))
+            results = self.cursor.fetchall()
+            return results
+        except mysql.connector.Error as err:
+            print(err.msg)
+        finally:
+            self.close_connection()
+
+    def __select_settlement_rule_users(self, settlement_rule_id):
+        sql = ('SELECT '
+               'settlementRuleId, '
+               'userId, '
+               'amount, '
+               'priority '
+               'FROM settlement_rule_user_tbl '
+               'WHERE '
+               'settlementRuleId=%s '
+               'ORDER BY priority ')
+        try:
+            self.connect_to_db()
+            self.cursor.execute(sql, (settlement_rule_id,))
+            results = self.cursor.fetchall()
+            return results
+        except mysql.connector.Error as err:
+            print(err.msg)
+        finally:
+            self.close_connection()
+
     def __select_default_expense_category(self, account_id):
-        sql = ('SELECT * FROM category_tbl '
+        sql = ('SELECT '
+               'categoryId, '
+               'name, '
+               'description, '
+               'categoryTypeId, '
+               'accountId '
+               'FROM category_tbl '
                'WHERE '
                'accountId=%s '
                'AND categoryTypeId=%s '
-               'ORDER BY categoryId')
+               'ORDER BY categoryId '
+               'LIMIT 1')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (account_id, 1))
@@ -684,11 +1125,18 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_default_income_category(self, account_id):
-        sql = ('SELECT * FROM category_tbl '
+        sql = ('SELECT '
+               'categoryId, '
+               'name, '
+               'description, '
+               'categoryTypeId, '
+               'accountId '
+               'FROM category_tbl '
                'WHERE '
                'accountId=%s '
                'AND categoryTypeId=%s '
-               'ORDER BY categoryId')
+               'ORDER BY categoryId '
+               'LIMIT 1')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (account_id, 2))
@@ -700,7 +1148,14 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_users_default_group(self, user_id):
-        sql = ('SELECT g.* FROM group_tbl g '
+        sql = ('SELECT '
+               'g.groupId, '
+               'g.name, '
+               'g.description, '
+               'g.settlementRuleId, '
+               'g.isMainGroup, '
+               'g.accountId '
+               'FROM group_tbl g '
                'JOIN user_tbl u '
                'ON g.groupId=u.mainGroupId '
                'WHERE userId=%s')
@@ -715,9 +1170,17 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_default_settlement_rule(self, account_id):
-        sql = ('SELECT * FROM settlement_rule_tbl '
+        sql = ('SELECT '
+               'settlementRuleId, '
+               'name, '
+               'description, '
+               'settlementTypeId, '
+               'accountId '
+               'FROM settlement_rule_tbl '
                'WHERE '
-               'accountId=%s')
+               'accountId=%s '
+               'ORDER BY settlement_rule_id '
+               'LIMIT 1')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (account_id,))
@@ -729,9 +1192,15 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_default_payment_method(self, account_id):
-        sql = ('SELECT * FROM payment_method_tbl '
+        sql = ('SELECT '
+               'paymentMethodId, '
+               'name, '
+               'accountId '
+               'FROM payment_method_tbl '
                'WHERE '
-               'accountId=%s')
+               'accountId=%s '
+               'ORDER BY payment_method_id '
+               'LIMIT 1')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (account_id,))
@@ -743,7 +1212,12 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_user(self, user_id):
-        sql = ('SELECT * FROM user_tbl ' 
+        sql = ('SELECT '
+               'userId, '
+               'username, '
+               'mainGroupId, '
+               'accountId '
+               'FROM user_tbl '
                'WHERE '
                'userId=%s ')
         try:
@@ -757,7 +1231,13 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_category(self, category_id):
-        sql = ('SELECT * FROM category_tbl '
+        sql = ('SELECT '
+               'categoryId, '
+               'name, '
+               'description, '
+               'categoryTypeId, '
+               'accountId '
+               'FROM category_tbl '
                'WHERE '
                'categoryId=%s ')
         try:
@@ -771,7 +1251,14 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_group(self, group_id):
-        sql = ('SELECT * FROM group_tbl '
+        sql = ('SELECT '
+               'groupId, '
+               'name, '
+               'description, '
+               'settlementRuleId, '
+               'isMainGroup, '
+               'accountId '
+               'FROM group_tbl '
                'WHERE '
                'groupId=%s ')
         try:
@@ -785,7 +1272,11 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_payment_method(self, payment_method_id):
-        sql = ('SELECT * FROM payment_method_tbl '
+        sql = ('SELECT '
+               'paymentMethodId, '
+               'name, '
+               'accountId '
+               'FROM payment_method_tbl ' 
                'WHERE '
                'paymentMethodId=%s ')
         try:
@@ -799,7 +1290,13 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_settlement_rule(self, settlement_rule_id):
-        sql = ('SELECT * FROM settlement_rule_tbl '
+        sql = ('SELECT '
+               'settlementRuleId, '
+               'name, '
+               'description, '
+               'settlementTypeId, '
+               'accountId '
+               'FROM settlement_rule_tbl '
                'WHERE '
                'settlementRuleId=%s ')
         try:

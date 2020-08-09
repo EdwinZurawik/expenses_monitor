@@ -130,6 +130,20 @@ class DatabaseManager:
             )
         return results
 
+    def get_all_users_from_group(self, group_id, order_by='username'):
+        data = self.__select_all_users_from_group(group_id, order_by)
+        results = []
+        for row in data:
+            results.append(
+                {
+                    'user_id': row[0],
+                    'username': row[1],
+                    'main_group_id': row[2],
+                    'account_id': row[3]
+                }
+            )
+        return results
+
     def get_all_categories(self, account_id, order_by='name'):
         data = self.__select_all_categories(account_id, order_by)
         results = []
@@ -224,14 +238,17 @@ class DatabaseManager:
                     'operation_date': row[1],
                     'amount': row[2],
                     'expense_name': row[3],
-                    'username': row[4],
-                    'category_name': row[5],
-                    'payment_method_name': row[6],
-                    'group_name': row[7],
-                    'user_id': row[8],
-                    'category_id': row[9],
-                    'payment_method_id': row[10],
-                    'group_id': row[11]
+                    'description': row[4],
+                    'username': row[5],
+                    'category_name': row[6],
+                    'payment_method_name': row[7],
+                    'group_name': row[8],
+                    'user_id': row[9],
+                    'category_id': row[10],
+                    'payment_method_id': row[11],
+                    'group_id': row[12],
+                    'settlement_rule_id': row[13],
+                    'settlement_type_id': row[14]
                 }
             )
         return results
@@ -247,14 +264,17 @@ class DatabaseManager:
                     'operation_date': row[1],
                     'amount': row[2],
                     'expense_name': row[3],
-                    'username': row[4],
-                    'category_name': row[5],
-                    'payment_method_name': row[6],
-                    'group_name': row[7],
-                    'user_id': row[8],
-                    'category_id': row[9],
-                    'payment_method_id': row[10],
-                    'group_id': row[11]
+                    'description': row[4],
+                    'username': row[5],
+                    'category_name': row[6],
+                    'payment_method_name': row[7],
+                    'group_name': row[8],
+                    'user_id': row[9],
+                    'category_id': row[10],
+                    'payment_method_id': row[11],
+                    'group_id': row[12],
+                    'settlement_rule_id': row[13],
+                    'settlement_type_id': row[14]
                 }
             )
         return results
@@ -272,7 +292,9 @@ class DatabaseManager:
                     'category_name': row[4],
                     'group_name': row[5],
                     'category_id': row[6],
-                    'group_id': row[7]
+                    'group_id': row[7],
+                    'settlement_rule_id': row[8],
+                    'settlement_type_id': row[9]
                 }
             )
         return results
@@ -291,7 +313,9 @@ class DatabaseManager:
                     'category_name': row[4],
                     'group_name': row[5],
                     'category_id': row[6],
-                    'group_id': row[7]
+                    'group_id': row[7],
+                    'settlement_rule_id': row[8],
+                    'settlement_type_id': row[9]
                 }
             )
         return results
@@ -446,15 +470,19 @@ class DatabaseManager:
                     'operation_date': data[1],
                     'amount': data[2],
                     'expense_name': data[3],
-                    'username': data[4],
-                    'category_name': data[5],
-                    'payment_method_name': data[6],
-                    'group_name': data[7],
-                    'user_id': data[8],
-                    'category_id': data[9],
-                    'payment_method_id': data[10],
-                    'group_id': data[11]
+                    'description': data[4],
+                    'username': data[5],
+                    'category_name': data[6],
+                    'payment_method_name': data[7],
+                    'group_name': data[8],
+                    'user_id': data[9],
+                    'category_id': data[10],
+                    'payment_method_id': data[11],
+                    'group_id': data[12],
+                    'settlement_rule_id': data[13],
+                    'settlement_type_id': data[14]
                 }
+
         return result
 
     def get_income(self, income_id):
@@ -469,7 +497,9 @@ class DatabaseManager:
                     'category_name': data[4],
                     'group_name': data[5],
                     'category_id': data[6],
-                    'group_id': data[7]
+                    'group_id': data[7],
+                    'settlement_rule_id': data[8],
+                    'settlement_type_id': data[9]
                 }
         return result
 
@@ -581,10 +611,13 @@ class DatabaseManager:
                'VALUES'
                '(%s, %s, %s, %s)')
         try:
+            self.connect_to_db()
             self.cursor.execute(sql, (settlement_rule_id, user_id, amount, priority))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+        finally:
+            self.close_connection()
 
     def __insert_users_to_settlement_rule(self):
         pass
@@ -815,6 +848,29 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
+    def __select_all_users_from_group(self, group_id, order_by='username'):
+        sql = ('SELECT '
+               'userId, '
+               'username, '
+               'mainGroupId, '
+               'accountId '
+               ' FROM user_tbl '
+               'WHERE '
+               'userId IN('
+               '    SELECT userId FROM user_group_tbl '
+               '    WHERE groupId=%s'
+               '    ) '
+               f'ORDER BY {order_by}')
+        try:
+            self.connect_to_db()
+            self.cursor.execute(sql, (group_id,))
+            results = self.cursor.fetchall()
+            return results
+        except mysql.connector.Error as err:
+            print(err.msg)
+        finally:
+            self.close_connection()
+
     def __select_all_categories(self, account_id, order_by='name'):
         sql = ('SELECT '
                'categoryId, '
@@ -937,6 +993,7 @@ class DatabaseManager:
                'e.operationDate, '
                'e.amount, '
                'e.name, '
+               'e.description, '
                'u.username, '
                'c.name, '
                'p.name, '
@@ -944,16 +1001,20 @@ class DatabaseManager:
                'u.userId, '
                'c.categoryId, '
                'p.paymentMethodId, '
-               'g.groupId '
+               'g.groupId, '
+               'g.settlementRuleId, '
+               's.settlementTypeId '
                'FROM expense_tbl e '
-               'INNER JOIN user_tbl u '
+               'LEFT JOIN user_tbl u '
                'ON e.payerId=u.userId '
-               'INNER JOIN category_tbl c '
+               'LEFT JOIN category_tbl c '
                'ON e.categoryId=c.categoryId '
-               'INNER JOIN payment_method_tbl p '
+               'LEFT JOIN payment_method_tbl p '
                'ON e.paymentMethodId=p.paymentMethodId '
-               'INNER JOIN group_tbl g '
+               'LEFT JOIN group_tbl g '
                'ON e.groupId=g.groupId '
+               'LEFT JOIN settlement_rule_tbl s '
+               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'u.accountId=%s '
                f'ORDER BY {order_by}')
@@ -983,6 +1044,7 @@ class DatabaseManager:
                'e.operationDate, '
                'e.amount, '
                'e.name, '
+               'e.description, '
                'u.username, '
                'c.name, '
                'p.name, '
@@ -990,16 +1052,20 @@ class DatabaseManager:
                'u.userId, '
                'c.categoryId, '
                'p.paymentMethodId, '
-               'g.groupId '
+               'g.groupId, '
+               'g.settlementRuleId, '
+               's.settlementTypeId '
                'FROM expense_tbl e '
-               'INNER JOIN user_tbl u '
+               'LEFT JOIN user_tbl u '
                'ON e.payerId=u.userId '
-               'INNER JOIN category_tbl c '
+               'LEFT JOIN category_tbl c '
                'ON e.categoryId=c.categoryId '
-               'INNER JOIN payment_method_tbl p '
+               'LEFT JOIN payment_method_tbl p '
                'ON e.paymentMethodId=p.paymentMethodId '
-               'INNER JOIN group_tbl g '
+               'LEFT JOIN group_tbl g '
                'ON e.groupId=g.groupId '
+               'LEFT JOIN settlement_rule_tbl s '
+               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'u.accountId=%s '
                'AND e.operationDate BETWEEN %s and %s '
@@ -1023,12 +1089,16 @@ class DatabaseManager:
                'c.name, '
                'g.name, '
                'c.categoryId, '
-               'g.groupId '
+               'g.groupId, '
+               'g.settlementRuleId, '
+               's.settlementTypeId '
                'FROM income_tbl i '
-               'LEFT JOIN category_tbl c '
+               'INNER JOIN category_tbl c '
                'ON i.categoryId=c.categoryId '
-               'LEFT JOIN group_tbl g '
+               'INNER JOIN group_tbl g '
                'ON i.groupId=g.groupId '
+               'INNER JOIN settlement_rule_tbl s '
+               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'g.accountId=%s '
                f'ORDER BY {order_by}')
@@ -1061,12 +1131,16 @@ class DatabaseManager:
                'c.name, '
                'g.name, '
                'c.categoryId, '
-               'g.groupId '
+               'g.groupId, '
+               'g.settlementRuleId, '
+               's.settlementTypeId '
                'FROM income_tbl i '
-               'LEFT JOIN category_tbl c '
+               'INNER JOIN category_tbl c '
                'ON i.categoryId=c.categoryId '
-               'LEFT JOIN group_tbl g '
+               'INNER JOIN group_tbl g '
                'ON i.groupId=g.groupId '
+               'INNER JOIN settlement_rule_tbl s '
+               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'g.accountId=%s '
                'AND i.operationDate BETWEEN %s and %s '
@@ -1323,7 +1397,9 @@ class DatabaseManager:
                'u.userId, '
                'c.categoryId, '
                'p.paymentMethodId, '
-               'g.groupId '
+               'g.groupId, '
+               'g.settlementRuleId, '
+               's.settlementTypeId '
                'FROM expense_tbl e '
                'INNER JOIN user_tbl u '
                'ON e.payerId=u.userId '
@@ -1333,6 +1409,8 @@ class DatabaseManager:
                'ON e.paymentMethodId=p.paymentMethodId '
                'INNER JOIN group_tbl g '
                'ON e.groupId=g.groupId '
+               'INNER JOIN settlement_rule_tbl s '
+               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'e.expenseId=%s ')
         try:
@@ -1355,12 +1433,16 @@ class DatabaseManager:
                'c.name, '
                'g.name, '
                'c.categoryId, '
-               'g.groupId '
+               'g.groupId, '
+               'g.settlementRuleId, '
+               's.settlementTypeId '
                'FROM income_tbl i '
-               'LEFT JOIN category_tbl c '
+               'INNER JOIN category_tbl c '
                'ON i.categoryId=c.categoryId '
-               'LEFT JOIN group_tbl g '
+               'INNER JOIN group_tbl g '
                'ON i.groupId=g.groupId '
+               'INNER JOIN settlement_rule_tbl s '
+               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'g.accountId=%s ')
         try:

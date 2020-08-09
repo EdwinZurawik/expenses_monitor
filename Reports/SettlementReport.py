@@ -4,47 +4,33 @@ from DatabaseManagement.DatabaseManager import DatabaseManager
 class SettlementReport:
     manager = DatabaseManager()
 
-    def get_data_from_db(self, account_id, date_from, date_to):
+    def get_data_from_db(self, account_id, report_group_id, date_from, date_to):
         expenses_list = self.manager.get_all_expenses_between_dates(account_id, date_from, date_to)
-        report_data = []
+        report_group = self.manager.get_all_users_from_group(report_group_id)
+        report_data = {'report_group': report_group, 'expenses': []}
+
         for expense in expenses_list:
-            group = self.manager.get_group(expense['group_id'])
-            settlement_rule_id = group['settlement_rule_id']
-            settlement_rule = self.manager.get_settlement_rule(settlement_rule_id)
-            settlement_type_id = None
-            if settlement_rule != {}:
-                settlement_type_id = settlement_rule['settlement_rule_id']
+            settlement_type_id = expense['settlement_type_id']
+            group = self.manager.get_settlement_rule_users(expense['settlement_rule_id'])
 
-            settlement_rule_users = self.manager.get_settlement_rule_users(settlement_rule_id)
-            group_users = []
-            for user in settlement_rule_users:
-                group_users.append(
-                    (
-                        user['user_id'],
-                        user['amount'],
-                        user['priority']
-                    )
-                )
-
-            report_data.append( ##  DODAĆ OBSŁUGĘ REPORT GROUP
+            report_data['expenses'].append(
                 {
-                    'payer_id': expense['username'],
-                    'group': group_users,
+                    'payer_id': expense['user_id'],
+                    'group': group,
                     'amount': expense['amount'],
                     'settlement_type_id': settlement_type_id
                 }
             )
         return report_data
 
-    def generate_report_data(self, account_id, report_group, date_from, date_to):
+    def generate_report_data(self, account_id, report_group_id, date_from, date_to):
         users = {}
-        report_data = self.get_data_from_db(account_id, date_from, date_to)
-        for row in report_data:
+        report_data = self.get_data_from_db(account_id, report_group_id, date_from, date_to)
+        for row in report_data['expenses']:
             if row['settlement_type_id'] == 1:
-                to_settle = self.settle_by_percent(report_group, row['payer_id'], row['group'], row['amount'])
-
+                to_settle = self.settle_by_percent(report_data['report_group'], row['payer_id'], row['group'], row['amount'])
             elif row['settlement_type_id'] == 2:
-                to_settle = self.settle_by_amount(report_group, row['payer_id'], row['group_id'], row['amount'])
+                to_settle = self.settle_by_amount(report_data['report_group'], row['payer_id'], row['group_id'], row['amount'])
             else:
                 continue
             for k in to_settle:
@@ -63,33 +49,38 @@ class SettlementReport:
         return users
 
     def settle_by_percent(self, report_group, payer_id, group, amount):
-        group.sort(key=lambda tup: tup[0])
         to_settle = {}
 
         for member in group:
-            member_id = member[1]
-            member_percent = member[2]
+            member_id = member['user_id']
+            member_percent = member['amount']
 
-            if payer_id in report_group and member_id != payer_id:
+            member_ids = []
+            for report_group_member in report_group:
+                member_ids.append(report_group_member['user_id'])
+            if payer_id in member_ids and member_id != payer_id:
                 outcome = member_percent * amount / 100
                 to_settle = self.add_element_to_dict_of_dicts(payer_id, member_id, outcome, to_settle)
-            elif payer_id not in report_group and member_id in report_group:
+            elif payer_id not in member_ids and member_id in member_ids:
                 outcome = member_percent * amount / 100
                 to_settle = self.add_element_to_dict_of_dicts(payer_id, member_id, outcome, to_settle)
                 break
         return to_settle
 
     def settle_by_amount(self, report_group, payer_id, group, amount):
-        group.sort(key=lambda tup: tup[0])
         to_settle = {}
 
         for i, member in enumerate(group):
             member_id = member[1]
             member_amount = member[2]
 
+            member_ids = []
+            for report_group_member in report_group:
+                member_ids.append(report_group_member['user_id'])
+
             if amount <= 0:
                 break
-            if payer_id in report_group:
+            if payer_id in member_ids:
                 if (i == len(group) - 1) or member_amount >= amount:
                     outcome = amount
                     amount = 0
@@ -98,14 +89,14 @@ class SettlementReport:
                     amount = amount - member_amount
                 if member_id != payer_id:
                     to_settle = self.add_element_to_dict_of_dicts(payer_id, member_id, outcome, to_settle)
-            elif payer_id not in report_group:
+            elif payer_id not in member_ids:
                 if i == len(group) - 1 or member_amount >= amount:
                     outcome = amount
                     amount = 0
                 else:
                     outcome = member_amount
                     amount = amount - member_amount
-                if member_id in report_group:
+                if member_id in member_ids:
                     to_settle = self.add_element_to_dict_of_dicts(payer_id, member_id, outcome, to_settle)
         return to_settle
 

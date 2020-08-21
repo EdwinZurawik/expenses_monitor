@@ -34,33 +34,24 @@ class DatabaseManager:
         return account_id
 
     def create_user(self, account_id, username):
-        # Creating default settlement rule for this user
-        settlement_rule_id = self.create_settlement_rule(account_id, 'default settlement',
-                                                         'Domyślny typ rozliczenia.', 1)
         # Creating default group for this user
         group_id = self.create_group(account_id, username, f'Default group of the user {username}',
-                                     settlement_rule_id, is_main_group=True)
+                                     1, is_main_group=True)
         user_id = self.__insert_user(account_id, username, group_id)
-        self.add_user_to_group(user_id, group_id)
+        # Adding user to his default group
+        self.add_user_to_group(user_id, group_id, 100, 1)
         return user_id
 
-    def create_group(self, account_id, name, description, settlement_rule_id, is_main_group=False):
-        group_id = self.__insert_group(account_id, name, description, settlement_rule_id, is_main_group)
+    def create_group(self, account_id, name, description, settlement_type_id, is_main_group=False):
+        group_id = self.__insert_group(account_id, name, description, settlement_type_id, is_main_group)
         return group_id
 
-    def add_user_to_group(self, user_id, group_id):
-        self.__insert_user_to_group(user_id, group_id)
+    def add_user_to_group(self, user_id, group_id, amount, priority):
+        self.__insert_user_to_group(user_id, group_id, amount, priority)
 
     def create_category(self, account_id, name, description, category_type_id):
         category_id = self.__insert_category(account_id, name, description, category_type_id)
         return category_id
-
-    def create_settlement_rule(self, account_id, name, description, settlement_type_id):
-        settlement_rule_id = self.__insert_settlement_rule(account_id, name, description, settlement_type_id)
-        return settlement_rule_id
-
-    def add_user_to_settlement_rule(self, settlement_rule_id, user_id, amount, priority):
-        self.__insert_user_to_settlement_rule(settlement_rule_id, user_id, amount, priority)
 
     def create_expense(self, operation_date, name, description, payer_id,
                        category_id, amount, payment_method_id, group_id):
@@ -84,14 +75,11 @@ class DatabaseManager:
     def edit_user(self, user_id, username):
         self.__update_user(user_id, username)
 
-    def edit_group(self, group_id, name, description, settlement_rule_id):
-        self.__update_group(group_id, name, description, settlement_rule_id)
+    def edit_group(self, group_id, name, description, settlement_type_id):
+        self.__update_group(group_id, name, description, settlement_type_id)
 
     def edit_category(self, category_id, name, description, category_type_id):
         self.__update_category(category_id, name, description, category_type_id)
-
-    def edit_settlement_rule(self, settlement_rule_id, name, description, settlement_type_id):
-        self.__update_settlement_rule(settlement_rule_id, name, description, settlement_type_id)
 
     def edit_expense(self, expense_id, operation_date, name, description, amount, payer_id, category_id, group_id):
         self.__update_expense(expense_id, operation_date, name, description, amount, payer_id, category_id, group_id)
@@ -168,7 +156,7 @@ class DatabaseManager:
                     'group_id': row[0],
                     'name': row[1],
                     'description': row[2],
-                    'settlement_rule_id': row[3],
+                    'settlement_type_id': row[3],
                     'is_main_group': row[4],
                     'account_id': row[5]
                 }
@@ -213,21 +201,6 @@ class DatabaseManager:
             )
         return results
 
-    def get_all_settlement_rules(self, account_id, order_by='name'):
-        data = self.__select_all_settlement_rules(account_id, order_by)
-        results = []
-        for row in data:
-            results.append(
-                {
-                    'settlement_rule_id': row[0],
-                    'name': row[1],
-                    'description': row[2],
-                    'settlement_type_id': row[3],
-                    'account_id': row[4]
-                }
-            )
-        return results
-
     def get_all_expenses(self, account_id, order_by='e.operationDate, c.name, e.name'):
         data = self.__select_all_expenses(account_id, order_by)
         results = []
@@ -247,8 +220,7 @@ class DatabaseManager:
                     'category_id': row[10],
                     'payment_method_id': row[11],
                     'group_id': row[12],
-                    'settlement_rule_id': row[13],
-                    'settlement_type_id': row[14]
+                    'settlement_type_id': row[13]
                 }
             )
         return results
@@ -273,8 +245,7 @@ class DatabaseManager:
                     'category_id': row[10],
                     'payment_method_id': row[11],
                     'group_id': row[12],
-                    'settlement_rule_id': row[13],
-                    'settlement_type_id': row[14]
+                    'settlement_type_id': row[13]
                 }
             )
         return results
@@ -293,8 +264,7 @@ class DatabaseManager:
                     'group_name': row[5],
                     'category_id': row[6],
                     'group_id': row[7],
-                    'settlement_rule_id': row[8],
-                    'settlement_type_id': row[9]
+                    'settlement_type_id': row[8]
                 }
             )
         return results
@@ -314,22 +284,7 @@ class DatabaseManager:
                     'group_name': row[5],
                     'category_id': row[6],
                     'group_id': row[7],
-                    'settlement_rule_id': row[8],
-                    'settlement_type_id': row[9]
-                }
-            )
-        return results
-
-    def get_settlement_rule_users(self, settlement_rule_id):
-        data = self.__select_settlement_rule_users(settlement_rule_id)
-        results = []
-        for row in data:
-            results.append(
-                {
-                    'settlement_rule_id': row[0],
-                    'user_id': row[1],
-                    'amount': row[2],
-                    'priority': row[3],
+                    'settlement_type_id': row[8]
                 }
             )
         return results
@@ -368,22 +323,9 @@ class DatabaseManager:
                     'group_id': data[0],
                     'name': data[1],
                     'description': data[2],
-                    'settlement_rule_id': data[3],
+                    'settlement_type_id': data[3],
                     'is_main_group': data[4],
                     'account_id': data[5]
-                }
-        return result
-
-    def get_default_settlement_rule(self, account_id):
-        data = self.__select_default_settlement_rule(account_id)
-        result = {}
-        if data is not None:
-            result = {
-                    'settlement_rule_id': data[0],
-                    'name': data[1],
-                    'description': data[2],
-                    'settlement_type_id': data[3],
-                    'account_id': data[4]
                 }
         return result
 
@@ -431,7 +373,7 @@ class DatabaseManager:
                 'group_id': data[0],
                 'name': data[1],
                 'description': data[2],
-                'settlement_rule_id': data[3],
+                'settlement_type_id': data[3],
                 'is_main_group': data[4],
                 'account_id': data[5]
             }
@@ -445,19 +387,6 @@ class DatabaseManager:
                     'payment_method_id': data[0],
                     'name': data[1],
                     'account_id': data[2]
-                }
-        return result
-
-    def get_settlement_rule(self, settlement_rule_id):
-        data = self.__select_settlement_rule(settlement_rule_id)
-        result = {}
-        if data is not None:
-            result = {
-                    'settlement_rule_id': data[0],
-                    'name': data[1],
-                    'description': data[2],
-                    'settlement_type_id': data[3],
-                    'account_id': data[4]
                 }
         return result
 
@@ -479,8 +408,7 @@ class DatabaseManager:
                     'category_id': data[10],
                     'payment_method_id': data[11],
                     'group_id': data[12],
-                    'settlement_rule_id': data[13],
-                    'settlement_type_id': data[14]
+                    'settlement_type_id': data[13]
                 }
 
         return result
@@ -498,8 +426,7 @@ class DatabaseManager:
                     'group_name': data[5],
                     'category_id': data[6],
                     'group_id': data[7],
-                    'settlement_rule_id': data[8],
-                    'settlement_type_id': data[9]
+                    'settlement_type_id': data[8]
                 }
         return result
 
@@ -538,14 +465,14 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __insert_group(self, account_id, name, description, settlement_rule_id, is_main_group=False):
+    def __insert_group(self, account_id, name, description, settlement_type_id, is_main_group=False):
         sql = ('INSERT INTO group_tbl'
-               '(name, description, settlementRuleId, isMainGroup, accountId)'
+               '(name, description, settlementTypeId, isMainGroup, accountId)'
                'VALUES'
                '(%s, %s, %s, %s, %s)')
         try:
             self.connect_to_db()
-            self.cursor.execute(sql, (name, description, settlement_rule_id, is_main_group, account_id))
+            self.cursor.execute(sql, (name, description, settlement_type_id, is_main_group, account_id))
             self.db.commit()
             group_id = self.cursor.lastrowid
             return group_id
@@ -555,14 +482,14 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __insert_user_to_group(self, user_id, group_id):
+    def __insert_user_to_group(self, user_id, group_id, amount, priority):
         sql = ('INSERT INTO user_group_tbl'
-               '(userId, groupId)'
+               '(userId, groupId, amount, priority)'
                'VALUES'
-               '(%s, %s)')
+               '(%s, %s, %s, %s)')
         try:
             self.connect_to_db()
-            self.cursor.execute(sql, (user_id, group_id))
+            self.cursor.execute(sql, (user_id, group_id, amount, priority))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
@@ -588,39 +515,6 @@ class DatabaseManager:
             print(err.msg)
         finally:
             self.close_connection()
-
-    def __insert_settlement_rule(self, account_id, name, description, settlement_type_id):
-        sql = ('INSERT INTO settlement_rule_tbl'
-               '(name, description, settlementTypeId, accountId)'
-               'VALUES'
-               '(%s, %s, %s, %s)')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (name, description, settlement_type_id, account_id))
-            self.db.commit()
-            settlement_rule_id = self.cursor.lastrowid
-            return settlement_rule_id
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
-    def __insert_user_to_settlement_rule(self, settlement_rule_id, user_id, amount, priority):
-        sql = ('INSERT INTO settlement_rule_user_tbl'
-               '(settlementRuleId, userId, amount, priority)'
-               'VALUES'
-               '(%s, %s, %s, %s)')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (settlement_rule_id, user_id, amount, priority))
-            self.db.commit()
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
-    def __insert_users_to_settlement_rule(self):
-        pass
 
     def __insert_expense(self, operation_date, name, description, payer_id,
                          category_id, amount, payment_method_id, group_id):
@@ -703,16 +597,16 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __update_group(self, group_id, name, description, settlement_rule_id):
+    def __update_group(self, group_id, name, description, settlement_type_id):
         sql = ('UPDATE group_tbl '
                'SET '
                'name = %s, '
                'description = %s, '
-               'settlementRuleId = %s '
+               'settlementTypeId = %s '
                'WHERE groupId = %s')
         try:
             self.connect_to_db()
-            self.cursor.execute(sql, (group_id, name, description, settlement_rule_id))
+            self.cursor.execute(sql, (group_id, name, description, settlement_type_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
@@ -729,22 +623,6 @@ class DatabaseManager:
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (category_id, name, description, category_type_id))
-            self.db.commit()
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
-    def __update_settlement_rule(self, settlement_rule_id, name, description, settlement_type_id):
-        sql = ('UPDATE settlement_rule_tbl '
-               'SET '
-               'name = %s, '
-               'description = %s, '
-               'settlementTypeId = %s '
-               'WHERE settlementRuleId = %s')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (settlement_rule_id, name, description, settlement_type_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
@@ -850,16 +728,17 @@ class DatabaseManager:
 
     def __select_all_users_from_group(self, group_id, order_by='username'):
         sql = ('SELECT '
-               'userId, '
-               'username, '
-               'mainGroupId, '
-               'accountId '
-               ' FROM user_tbl '
+               'u.userId, '
+               'u.username, '
+               'u.mainGroupId, '
+               'u.accountId, '
+               'ug.amount, '
+               'ug.priority '
+               'FROM user_tbl u '
+               'JOIN user_group_tbl ug'
+               'ON u.user_id=ug.user_id'
                'WHERE '
-               'userId IN('
-               '    SELECT userId FROM user_group_tbl '
-               '    WHERE groupId=%s'
-               '    ) '
+               'ug.groupId=%s '
                f'ORDER BY {order_by}')
         try:
             self.connect_to_db()
@@ -897,7 +776,7 @@ class DatabaseManager:
                'groupId, '
                'name, '
                'description, '
-               'settlementRuleId, '
+               'settlementTypeId, '
                'isMainGroup, '
                'accountId '
                'FROM group_tbl ' 
@@ -966,27 +845,6 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __select_all_settlement_rules(self, account_id, order_by='name'):
-        sql = ('SELECT '
-               'settlementRuleId, '
-               'name, '
-               'description, '
-               'settlementTypeId, '
-               'accountId '
-               'FROM settlement_rule_tbl ' 
-               'WHERE '
-               'accountId=%s '
-               f'ORDER BY {order_by}')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (account_id,))
-            results = self.cursor.fetchall()
-            return results
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
     def __select_all_expenses(self, account_id, order_by='e.operationDate, c.name, e.name'):
         sql = ('SELECT '
                'e.expenseId, '
@@ -1002,8 +860,7 @@ class DatabaseManager:
                'c.categoryId, '
                'p.paymentMethodId, '
                'g.groupId, '
-               'g.settlementRuleId, '
-               's.settlementTypeId '
+               'g.settlementTypeId '
                'FROM expense_tbl e '
                'LEFT JOIN user_tbl u '
                'ON e.payerId=u.userId '
@@ -1013,8 +870,6 @@ class DatabaseManager:
                'ON e.paymentMethodId=p.paymentMethodId '
                'LEFT JOIN group_tbl g '
                'ON e.groupId=g.groupId '
-               'LEFT JOIN settlement_rule_tbl s '
-               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'u.accountId=%s '
                f'ORDER BY {order_by}')
@@ -1053,8 +908,7 @@ class DatabaseManager:
                'c.categoryId, '
                'p.paymentMethodId, '
                'g.groupId, '
-               'g.settlementRuleId, '
-               's.settlementTypeId '
+               'g.settlementTypeId '
                'FROM expense_tbl e '
                'LEFT JOIN user_tbl u '
                'ON e.payerId=u.userId '
@@ -1064,8 +918,6 @@ class DatabaseManager:
                'ON e.paymentMethodId=p.paymentMethodId '
                'LEFT JOIN group_tbl g '
                'ON e.groupId=g.groupId '
-               'LEFT JOIN settlement_rule_tbl s '
-               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'u.accountId=%s '
                'AND e.operationDate BETWEEN %s and %s '
@@ -1090,15 +942,12 @@ class DatabaseManager:
                'g.name, '
                'c.categoryId, '
                'g.groupId, '
-               'g.settlementRuleId, '
-               's.settlementTypeId '
+               'g.settlementTypeId '
                'FROM income_tbl i '
                'INNER JOIN category_tbl c '
                'ON i.categoryId=c.categoryId '
                'INNER JOIN group_tbl g '
                'ON i.groupId=g.groupId '
-               'INNER JOIN settlement_rule_tbl s '
-               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'g.accountId=%s '
                f'ORDER BY {order_by}')
@@ -1132,15 +981,12 @@ class DatabaseManager:
                'g.name, '
                'c.categoryId, '
                'g.groupId, '
-               'g.settlementRuleId, '
-               's.settlementTypeId '
+               'g.settlementTypeId '
                'FROM income_tbl i '
                'INNER JOIN category_tbl c '
                'ON i.categoryId=c.categoryId '
                'INNER JOIN group_tbl g '
                'ON i.groupId=g.groupId '
-               'INNER JOIN settlement_rule_tbl s '
-               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'g.accountId=%s '
                'AND i.operationDate BETWEEN %s and %s '
@@ -1148,26 +994,6 @@ class DatabaseManager:
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (account_id, date_from, date_to))
-            results = self.cursor.fetchall()
-            return results
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
-    def __select_settlement_rule_users(self, settlement_rule_id):
-        sql = ('SELECT '
-               'settlementRuleId, '
-               'userId, '
-               'amount, '
-               'priority '
-               'FROM settlement_rule_user_tbl '
-               'WHERE '
-               'settlementRuleId=%s '
-               'ORDER BY priority ')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (settlement_rule_id,))
             results = self.cursor.fetchall()
             return results
         except mysql.connector.Error as err:
@@ -1226,7 +1052,7 @@ class DatabaseManager:
                'g.groupId, '
                'g.name, '
                'g.description, '
-               'g.settlementRuleId, '
+               'g.settlementTypeId, '
                'g.isMainGroup, '
                'g.accountId '
                'FROM group_tbl g '
@@ -1236,28 +1062,6 @@ class DatabaseManager:
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (user_id,))
-            result = self.cursor.fetchone()
-            return result
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
-    def __select_default_settlement_rule(self, account_id):
-        sql = ('SELECT '
-               'settlementRuleId, '
-               'name, '
-               'description, '
-               'settlementTypeId, '
-               'accountId '
-               'FROM settlement_rule_tbl '
-               'WHERE '
-               'accountId=%s '
-               'ORDER BY settlement_rule_id '
-               'LIMIT 1')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (account_id,))
             result = self.cursor.fetchone()
             return result
         except mysql.connector.Error as err:
@@ -1329,7 +1133,7 @@ class DatabaseManager:
                'groupId, '
                'name, '
                'description, '
-               'settlementRuleId, '
+               'settlementTypeId, '
                'isMainGroup, '
                'accountId '
                'FROM group_tbl '
@@ -1363,26 +1167,6 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __select_settlement_rule(self, settlement_rule_id):
-        sql = ('SELECT '
-               'settlementRuleId, '
-               'name, '
-               'description, '
-               'settlementTypeId, '
-               'accountId '
-               'FROM settlement_rule_tbl '
-               'WHERE '
-               'settlementRuleId=%s ')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (settlement_rule_id,))
-            result = self.cursor.fetchone()
-            return result
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
     def __select_expense(self, expense_id):
         sql = ('SELECT '
                'e.expenseId, '
@@ -1398,8 +1182,7 @@ class DatabaseManager:
                'c.categoryId, '
                'p.paymentMethodId, '
                'g.groupId, '
-               'g.settlementRuleId, '
-               's.settlementTypeId '
+               'g.settlementTypeId '
                'FROM expense_tbl e '
                'INNER JOIN user_tbl u '
                'ON e.payerId=u.userId '
@@ -1409,8 +1192,6 @@ class DatabaseManager:
                'ON e.paymentMethodId=p.paymentMethodId '
                'INNER JOIN group_tbl g '
                'ON e.groupId=g.groupId '
-               'INNER JOIN settlement_rule_tbl s '
-               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'e.expenseId=%s ')
         try:
@@ -1434,15 +1215,12 @@ class DatabaseManager:
                'g.name, '
                'c.categoryId, '
                'g.groupId, '
-               'g.settlementRuleId, '
-               's.settlementTypeId '
+               'g.settlementTypeId '
                'FROM income_tbl i '
                'INNER JOIN category_tbl c '
                'ON i.categoryId=c.categoryId '
                'INNER JOIN group_tbl g '
                'ON i.groupId=g.groupId '
-               'INNER JOIN settlement_rule_tbl s '
-               'ON g.settlementRuleId=s.settlementRuleId '
                'WHERE '
                'g.accountId=%s ')
         try:
@@ -1484,26 +1262,6 @@ class DatabaseManager:
         pass
 
     def delete_category(self):
-        pass
-
-    def delete_settlement_rule(self):
-        pass
-
-    def __delete_user_from_settlement_rule(self, user_id, settlement_rule_id):
-        sql = ('DELETE FROM settlement_rule_user_tbl '
-               'WHERE '
-               'userId = %s, '
-               'settlementRuleId = %s')
-        try:
-            self.connect_to_db()
-            self.cursor.execute(sql, (user_id, settlement_rule_id))
-            self.db.commit()
-        except mysql.connector.Error as err:
-            print(err.msg)
-        finally:
-            self.close_connection()
-
-    def delete_users_from_settlement_rule(self):
         pass
 
     def delete_expense(self):

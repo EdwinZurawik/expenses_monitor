@@ -48,13 +48,21 @@ def main():
 
     manager = DatabaseManager()
 
-    report_group = 11
+    # report_group = 11
+    #
+    # date_from = datetime(2005, 2, 1)
+    # date_to = datetime(2050, 10, 1)
+    # print_settlement_report(4, report_group, date_from, date_to)
+    # print_balance_report(4, report_group, date_from, date_to)
+    # print_payment_method_report(4, report_group, date_from, date_to)
 
-    date_from = datetime(2005, 2, 1)
-    date_to = datetime(2050, 10, 1)
-    print_settlement_report(4, report_group, date_from, date_to)
-    print_balance_report(4, report_group, date_from, date_to)
-    print_payment_method_report(4, report_group, date_from, date_to)
+    account = manager.get_account('Edwin', 'Edwin')
+    users = manager.get_all_users(account['account_id'])
+    group_id = manager.get_user(users[0]['user_id'])['main_group_id']
+    print(f"Grupa użytkownika {users[0]['username']}:")
+    print()
+    for item in manager.get_group(group_id).items():
+        print(item)
 
 
 if __name__ == '__main__':

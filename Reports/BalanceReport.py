@@ -1,5 +1,6 @@
 from DatabaseManagement.DatabaseManager import DatabaseManager
 
+
 class BalanceReport:
     manager = DatabaseManager()
 

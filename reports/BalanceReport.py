@@ -1,4 +1,4 @@
-from DatabaseManagement.DatabaseManager import DatabaseManager
+from database_manager.DatabaseManager import DatabaseManager
 
 
 class BalanceReport:

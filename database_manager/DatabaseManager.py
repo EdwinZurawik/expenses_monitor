@@ -1,6 +1,6 @@
 import mysql.connector
 # from mysql.connector import errorcode
-from ConfigurationData import ConfigurationData
+from configuration_data import ConfigurationData
 from datetime import datetime
 from datetime import date
 

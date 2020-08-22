@@ -1,0 +1,14 @@
+#: include screens/login_screen.kv
+#: include screens/create_account_screen.kv
+#: include screens/menu_screen.kv
+#: include screens/expenses_list_screen.kv
+#: include screens/expense_details_screen.kv
+#: import NoTransition kivy.uix.screenmanager.NoTransition
+
+<MyScreenManager>:
+    transition: NoTransition()
+    LoginScreen:
+    CreateAccountScreen:
+    MenuScreen:
+    ExpensesListScreen:
+    ExpenseDetailsScreen:

@@ -12,6 +12,7 @@ class DatabaseManager:
     def connect_to_db(self):
         self.db = mysql.connector.connect(**ConfigurationData.db_config)
         self.cursor = self.db.cursor()
+        return self.db
 
     def close_connection(self):
         self.db.close()
@@ -22,28 +23,37 @@ class DatabaseManager:
     def create_account(self, username, password, email):
         # Creating new account
         account_id = self.__insert_account(username, password, email)
+        if account_id is None:
+            account_id = {}
+        else:
+            # Creating default expense category for this account
+            self.create_category(account_id, 'Wydatki',
+                                 'Domyślna kategoria dla wydatków.', 1)
+            # Creating default income category for this account
+            self.create_category(account_id, 'Wpływy',
+                                 'Domyślna kategoria dla wpływów.', 2)
+            # Creating default payment method for this account
+            self.create_payment_method(account_id, 'Domyślna metoda płatności')
 
-        # Creating default expense category for this account
-        self.create_category(account_id, 'Wydatki',
-                             'Domyślna kategoria dla wydatków.', 1)
-        # Creating default income category for this account
-        self.create_category(account_id, 'Wpływy',
-                             'Domyślna kategoria dla wpływów.', 2)
-        # Creating default payment method for this account
-        self.create_payment_method(account_id, 'Domyślna metoda płatności')
         return account_id
 
     def create_user(self, account_id, username):
         # Creating default group for this user
         group_id = self.create_group(account_id, username, f'Default group of the user {username}',
                                      1, is_main_group=True)
-        user_id = self.__insert_user(account_id, username, group_id)
-        # Adding user to his default group
-        self.add_user_to_group(user_id, group_id, 100, 1)
+        user_id = {}
+        if group_id != {}:
+            user_id = self.__insert_user(account_id, username, group_id)
+            if user_id is None:
+                user_id = {}
+            # Adding user to his default group
+            self.add_user_to_group(user_id, group_id, 100, 1)
         return user_id
 
     def create_group(self, account_id, name, description, settlement_type_id, is_main_group=False):
         group_id = self.__insert_group(account_id, name, description, settlement_type_id, is_main_group)
+        if group_id is None:
+            group_id = {}
         return group_id
 
     def add_user_to_group(self, user_id, group_id, amount, priority):
@@ -51,6 +61,8 @@ class DatabaseManager:
 
     def create_category(self, account_id, name, description, category_type_id):
         category_id = self.__insert_category(account_id, name, description, category_type_id)
+        if category_id is None:
+            category_id = {}
         return category_id
 
     def create_expense(self, operation_date, name, description, payer_id,
@@ -65,6 +77,8 @@ class DatabaseManager:
 
     def create_payment_method(self, account_id, name):
         payment_method_id = self.__insert_payment_method(account_id, name)
+        if payment_method_id is None:
+            payment_method_id = {}
         return payment_method_id
 
     # ---------------------------------------------- EDIT ------------------------------------------------------------ #

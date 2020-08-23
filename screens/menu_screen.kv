@@ -60,6 +60,45 @@
                             pos: self.pos
                             size: self.size
                 Button:
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
+                    text: 'Dodaj kategorię'
+                    on_release: app.root.current = 'create_category_screen'
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Button:
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
+                    text: 'Dodaj użytkownika'
+                    on_release: app.root.current = 'create_user_screen'
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Button:
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
+                    text: 'Dodaj metodę płatności'
+                    on_release: app.root.current = 'create_payment_method_screen'
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Widget:
+                    size_hint_y: None
+                    height: 10
+                Button:
                     size_hint_y: None
                     font_size: 20
                     height: 30

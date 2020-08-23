@@ -1,5 +1,5 @@
-<ExpenseAddScreen>:
-    name: 'expense_add_screen'
+<CreateExpenseScreen>:
+    name: 'create_expense_screen'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -33,7 +33,6 @@
                             pos: self.pos
                             size: self.size
                     Label:
-                        id: name
                         font_size: 20
                         size_hint_y: None
                         height: 30
@@ -44,12 +43,46 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
+                    TextInput:
+                        id: name
+                        multiline: False
+                        font_size: 15
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
                     Label:
-                        id: date
                         font_size: 20
                         size_hint_y: None
                         height: 30
-                        text: 'xx.yy.zzzz'
+                        text: 'Data'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    TextInput:
+                        id: date
+                        multiline: False
+                        font_size: 15
+                        size_hint_y: None
+                        height: 30
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -68,12 +101,29 @@
                             size: self.size
                     BoxLayout:
                         padding: 10
+                        spacing: 10
                         pos: self.parent.pos
-                        ScrollableLabel:
-                            pos: self.parent.pos
+                        BoxLayout:
+                            orientation: 'vertical'
+                            Label:
+                                text: 'Opis'
+                                size_hint_y: None
+                                height: 30
+                                font_size: 20
+                                canvas:
+                                    Color:
+                                        rgba: 0.2, 0.1, 0.3, 0.5
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                            Widget:
+                        TextInput:
+                            id: description
+                            multiline: True
+                            font_size: 15
                             canvas:
                                 Color:
-                                    rgba: 0.2, 0.1, 0.3, 0.5
+                                    rgba: 1, 0, 0, 0.5
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -99,17 +149,10 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Edwin'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
+                    Button:
+                        id: payers_btn
+                        text: 'Wybierz'
+                        on_release: root.populate_dropdown()
                 BoxLayout:
                     size_hint_y: None
                     height: 40
@@ -132,11 +175,11 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    Label:
-                        font_size: 20
+                    TextInput:
+                        id: group_id
+                        font_size: 15
                         size_hint_y: None
                         height: 30
-                        text: 'Edwin i Ola'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -298,12 +341,13 @@
                     Widget:
                 Widget:
 
-
-<ScrollableLabel>:
-    text: str('hello '*100)
-    Label:
-        text: root.text
-        font_size: 20
-        text_size: self.width, None
-        size_hint_y: None
-        height: self.texture_size[1]
+<CustomDropdown>:
+    DropDown:
+        id: payers
+        canvas:
+            Color:
+                rgba: 1, 0, 0, 0.5
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        on_select: mainbtn.text = f'{args[1]}'

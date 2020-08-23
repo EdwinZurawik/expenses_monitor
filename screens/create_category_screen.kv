@@ -1,5 +1,5 @@
-<CreateAccountScreen>:
-    name: 'create_account_screen'
+<CreateCategoryScreen>:
+    name: 'create_category_screen'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -37,7 +37,7 @@
                         font_size: 20
                         size_hint_y: None
                         height: 30
-                        text: 'Nazwa konta'
+                        text: 'Nazwa kategorii'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -45,16 +45,53 @@
                                 pos: self.pos
                                 size: self.size
                     TextInput:
-                        id: username
+                        id: name
                         multiline: False
                         font_size: 15
                         size_hint_y: None
                         height: 30
                 BoxLayout:
                     size_hint_y: None
-                    height: 40
+                    height: 80
                     spacing: 10
                     padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    BoxLayout:
+                        orientation: 'vertical'
+                        canvas:
+                            Color:
+                                rgba: 0, 0, 1, 0
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                        Label:
+                            font_size: 20
+                            size_hint_y: None
+                            height: 30
+                            text: 'Opis'
+                            canvas:
+                                Color:
+                                    rgba: 1, 0, 0, 0.5
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Widget:
+                    TextInput:
+                        id: description
+                        multiline: True
+                        font_size: 15
+                        size_hint_y: None
+                        height: 60
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
                     canvas:
                         Color:
                             rgba: 0, 0, 1, 0
@@ -64,52 +101,28 @@
                     Label:
                         font_size: 20
                         size_hint_y: None
+                        size_hint_x: 2
                         height: 30
-                        text: 'Hasło'
+                        text: 'Typ'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    TextInput:
-                        id: password
-                        multiline: False
-                        password: True
-                        font_size: 15
-                        size_hint_y: None
-                        height: 30
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    padding: 10
-                    spacing: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Adres e-mail'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    TextInput:
-                        id: email
-                        multiline: False
-                        font_size: 15
-                        size_hint_y: None
-                        height: 30
+                    ToggleButton:
+                        id: expense_category
+                        text: 'wydatek'
+                        group: 'category_type'
+                        state: 'down'
+                    ToggleButton:
+                        id: income_category
+                        text: 'przychód'
+                        group: 'category_type'
                 BoxLayout:
                     size_hint_y: None
                     height: 50
+                    padding_y: 20
                     spacing: 10
                     canvas:
                         Color:
@@ -120,10 +133,10 @@
                     Button:
                         font_size: 20
                         size_hint_y: None
-                        size_hint_x: 0.6
+                        size_hint_x: 0.5
                         height: 30
-                        text: 'Wróć do ekranu logowania'
-                        on_release: app.root.current = 'login_screen'
+                        text: 'Powrót'
+                        on_release: app.root.current = 'menu_screen'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -133,33 +146,16 @@
                     Button:
                         font_size: 20
                         size_hint_y: None
-                        size_hint_x: 0.4
+                        size_hint_x: 0.5
                         height: 30
-                        text: 'Załóż konto'
-                        on_release: root.create_account(username, password, email)
+                        text: 'Dodaj'
+                        on_release: root.add_category(root.ids.name, root.ids.description, root.ids.expense_category, root.ids.income_category)
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    Widget:
-                    Button:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Wyjdź'
-                        on_release: app.stop()
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Widget:
                 Widget:
                 Label:
                     id: message

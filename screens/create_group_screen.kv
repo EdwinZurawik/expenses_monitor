@@ -1,5 +1,5 @@
-<CreateExpenseScreen>:
-    name: 'create_expense_screen'
+<CreateGroupScreen>:
+    name: 'create_group_screen'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -36,7 +36,7 @@
                         font_size: 20
                         size_hint_y: None
                         height: 30
-                        text: 'Nazwa'
+                        text: 'Nazwa grupy'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -45,40 +45,6 @@
                                 size: self.size
                     TextInput:
                         id: name
-                        multiline: False
-                        font_size: 15
-                        size_hint_y: None
-                        height: 30
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    padding: 10
-                    spacing: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Data'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    TextInput:
-                        id: date
                         multiline: False
                         font_size: 15
                         size_hint_y: None
@@ -130,8 +96,8 @@
                 BoxLayout:
                     size_hint_y: None
                     height: 40
-                    spacing: 10
                     padding: 10
+                    spacing: 10
                     canvas:
                         Color:
                             rgba: 0, 0, 1, 0
@@ -141,144 +107,40 @@
                     Label:
                         font_size: 20
                         size_hint_y: None
+                        size_hint_x: 2
                         height: 30
-                        text: 'Zapłacone przez:'
+                        text: 'Typ rozliczenia'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    ButtonWithData:
-                        id: payers_btn
-                        text: 'Wybierz'
-                        on_release: root.add_payers_dropdown()
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    spacing: 10
-                    padding: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
+                    ToggleButton:
+                        id: settlement_percent
+                        text: 'procentowe'
+                        group: 'settlement_type'
+                        state: 'down'
+                    ToggleButton:
+                        id: settlement_value
+                        text: 'kwotowe'
+                        group: 'settlement_type'
+                ScrollView: # wypełniony członkami grupy
+                    GridLayout:
+                        spacing: 5
+                        cols: 1
+                        orientation: 'vertical'
                         size_hint_y: None
-                        height: 30
-                        text: 'Grupa:'
+                        col_default_width: self.width
+                        row_default_height: 40
+                        height: self.minimum_height
+                        id: box
                         canvas:
                             Color:
-                                rgba: 1, 0, 0, 0.5
+                                rgba: 0, 1, 0, 0.5
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    ButtonWithData:
-                        id: groups_btn
-                        text: 'Wybierz'
-                        on_release: root.add_groups_dropdown()
-                        Widget:
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    spacing: 10
-                    padding: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Kategoria:'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    ButtonWithData:
-                        id: categories_btn
-                        text: 'Wybierz'
-                        on_release: root.add_categories_dropdown()
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    spacing: 10
-                    padding: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Kwota:'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    FloatInput:
-                        id: amount
-                        multiline: False
-                        font_size: 15
-                        size_hint_x: 0.7
-                        size_hint_y: None
-                        height: 30
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        size_hint_x: 0.3
-                        height: 30
-                        text: 'zł'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    spacing: 10
-                    padding: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Metoda płatności:'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    ButtonWithData:
-                        id: payment_methods_btn
-                        text: 'Wybierz'
-                        on_release: root.add_payment_methods_dropdown()
                 BoxLayout:
                     size_hint_y: None
                     height: 50
@@ -309,7 +171,7 @@
                         size_hint_x: 0.5
                         height: 30
                         text: 'Dodaj'
-                        on_release: root.add_expense(root.ids.name, root.ids.date, root.ids.description, root.ids.amount)
+                        on_release: root.add_group(root.ids.name, root.ids.description, root.ids.settlement_percent, root.ids.settlement_value)
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5

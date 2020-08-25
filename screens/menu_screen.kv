@@ -87,6 +87,18 @@
                     font_size: 20
                     size_hint_y: None
                     height: 30
+                    text: 'Dodaj grupę'
+                    on_release: app.root.current = 'create_group_screen'
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Button:
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
                     text: 'Dodaj metodę płatności'
                     on_release: app.root.current = 'create_payment_method_screen'
                     canvas:

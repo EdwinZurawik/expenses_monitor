@@ -1,6 +1,8 @@
 import re
+import datetime
 
 from kivy.uix.dropdown import DropDown
+from kivy.uix.textinput import TextInput
 
 from database_manager.DatabaseManager import DatabaseManager
 from configuration_data import ConfigurationData
@@ -11,7 +13,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
-from kivy.properties import NumericProperty, ObjectProperty
+from kivy.properties import NumericProperty, ObjectProperty, ListProperty
 from kivy.properties import StringProperty
 from kivy.uix.button import Button
 
@@ -43,15 +45,34 @@ class MenuScreen(Screen):
     pass
 
 
-class ButtonWithId(Button):
-    button_data = ObjectProperty(None)
+class ButtonWithData(Button):
+    button_data = ObjectProperty({'text': '', 'id': 0})
+
+    def on_button_data(self, *args):
+        self.text = self.button_data['text']
+
+
+class FloatInput(TextInput):
+
+    pat = re.compile('[^0-9]')
+
+    def insert_text(self, substring, from_undo=False):
+        pat = self.pat
+        if '.' in self.text:
+            s = re.sub(pat, '', substring)
+        else:
+            s = '.'.join([re.sub(pat, '', s) for s in substring.split('.', 1)])
+        return super(FloatInput, self).insert_text(s, from_undo=from_undo)
 
 
 class CreateExpenseScreen(Screen):
-    payer_id = NumericProperty(None)
+    payer_id = NumericProperty(0)
+    group_id = NumericProperty(0)
+    category_id = NumericProperty(0)
+    payment_method_id = NumericProperty(0)
 
-    def on_enter(self, *args):
-        pass
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
 
     def add_payers_dropdown(self):
         payers_dropdown = DropDown()
@@ -61,22 +82,215 @@ class CreateExpenseScreen(Screen):
         users_list = db_manager.get_all_users(app.root.account_id)
 
         for user in users_list:
-            btn = ButtonWithId(text=user['username'],
-                               size_hint_y=None,
-                               height='30',
-                               button_data=user)
+            btn = ButtonWithData(text=user['username'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': user['username'], 'id': user['user_id']})
             btn.bind(on_release=lambda btn: payers_dropdown.select(btn.button_data))
             payers_dropdown.add_widget(btn)
         payers_btn = self.ids.payers_btn
         payers_btn.bind(on_release=payers_dropdown.open)
-        payers_dropdown.bind(on_select=lambda instance, x: setattr(payers_btn, 'text', x['username']))
+        payers_dropdown.bind(on_select=lambda instance, x: setattr(payers_btn, 'button_data', x))
 
-    def populate_dropdown(self):
-        self.add_payers_dropdown()
+    def add_groups_dropdown(self):
+        groups_dropdown = DropDown()
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
 
-    def set_payer_id(self, button_id): # jak przekazać id płacącego?
-        self.payer_id = button_id
+        groups_list = db_manager.get_all_groups(app.root.account_id)
+
+        for group in groups_list:
+            btn = ButtonWithData(text=group['name'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': group['name'], 'id': group['group_id']})
+            btn.bind(on_release=lambda btn: groups_dropdown.select(btn.button_data))
+            groups_dropdown.add_widget(btn)
+        groups_btn = self.ids.groups_btn
+        groups_btn.bind(on_release=groups_dropdown.open)
+        groups_dropdown.bind(on_select=lambda instance, x: setattr(groups_btn, 'button_data', x))
+
+    def add_categories_dropdown(self):
+        categories_dropdown = DropDown()
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        categories_list = db_manager.get_all_categories(app.root.account_id)
+
+        for category in categories_list:
+            btn = ButtonWithData(text=category['name'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': category['name'], 'id': category['category_id']})
+            btn.bind(on_release=lambda btn: categories_dropdown.select(btn.button_data))
+            categories_dropdown.add_widget(btn)
+        categories_btn = self.ids.categories_btn
+        categories_btn.bind(on_release=categories_dropdown.open)
+        categories_dropdown.bind(on_select=lambda instance, x: setattr(categories_btn, 'button_data', x))
+
+    def add_payment_methods_dropdown(self):
+        payment_methods_dropdown = DropDown()
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        payment_methods_list = db_manager.get_all_payment_methods(app.root.account_id)
+
+        for payment_method in payment_methods_list:
+            btn = ButtonWithData(text=payment_method['name'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': payment_method['name'], 'id': payment_method['payment_method_id']})
+            btn.bind(on_release=lambda btn: payment_methods_dropdown.select(btn.button_data))
+            payment_methods_dropdown.add_widget(btn)
+        payment_methods_btn = self.ids.payment_methods_btn
+        payment_methods_btn.bind(on_release=payment_methods_dropdown.open)
+        payment_methods_dropdown.bind(on_select=lambda instance, x: setattr(payment_methods_btn, 'button_data', x))
+
+    def set_payer_id(self):
+        self.payer_id = self.ids.payers_btn.button_data['id']
+
+    def set_group_id(self):
+        self.group_id = self.ids.groups_btn.button_data['id']
+
+    def set_category_id(self):
+        self.category_id = self.ids.categories_btn.button_data['id']
+
+    def set_payment_method_id(self):
+        self.payment_method_id = self.ids.payment_methods_btn.button_data['id']
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name, date, description, amount):
+        return self.validate_name(name) \
+               and self.validate_date(date) \
+               and self.validate_description(description) \
+               and self.validate_payer_id() \
+               and self.validate_group_id() \
+               and self.validate_category_id()\
+               and self.validate_amount(amount) \
+               and self.validate_payment_method_id()
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa wydatku powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_date(self, date):
+        valid = False
+        date_regex = re.compile(r'([0-9]{2}\.[0-9]{2}\.[0-9]{4})')
+        date_match = re.search(date_regex, date)
+        if date == '':
+            self.show_message('Data jest polem wymaganym.')
+        elif date_match is None or date_match.group(1) != date:
+            self.show_message('Błędny format day. (DD.MM.RRRR')
+        else:
+            valid = True
+        return valid
+
+    def validate_description(self, description):
+        valid = False
+        if len(description) > 255:
+            self.show_message('Maksymalna długość opisu to 255 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_payer_id(self):
+        valid = False
         print(self.payer_id)
+        print(self.ids.payers_btn.button_data)
+        print(self.ids.payers_btn.button_data['id'])
+        self.set_payer_id()
+        if self.payer_id == 0:
+            self.show_message('Wybór osoby płacącej jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_group_id(self):
+        valid = False
+        self.set_group_id()
+        if self.group_id == 0:
+            self.show_message('Wybór grupy jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_category_id(self):
+        valid = False
+        self.set_category_id()
+        if self.category_id == 0:
+            self.show_message('Wybór kategorii jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_payment_method_id(self):
+        valid = False
+        self.set_payment_method_id()
+        if self.payment_method_id == 0:
+            self.show_message('Wybór metody płatniczej jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_amount(self, amount):
+        valid = False
+        amount_regex = re.compile(r'([0-9]+\.?[0-9]{0,2})')
+        amount_match = re.search(amount_regex, amount)
+        if amount == '':
+            self.show_message('Kwota jest polem wymaganym.')
+        elif amount_match is None or amount_match.group(1) != amount:
+            self.show_message('Błędna kwota.')
+        else:
+            valid = True
+        return valid
+
+    def check_in_database(self, name, date, description, amount):
+        db_manager = App.get_running_app().db_manager
+        date = datetime.datetime.strptime(date, '%d.%m.%Y')
+        formatted_date = date.strftime('%Y-%m-%d %H:%M:%S')
+        app = App.get_running_app()
+        print('Próbuję dodać wydatek')
+        user_id = db_manager.create_expense(formatted_date, name, description, self.payer_id,
+                                            self.category_id, amount, self.payment_method_id,
+                                            self.group_id)
+        print(app.root.account_id, name)
+        print(user_id)
+        return user_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+        self.ids.date.text = ''
+        self.ids.description.text = ''
+        self.ids.amount.text = ''
+        self.ids.payers_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.groups_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.categories_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.payment_methods_btn.button_data = {'text': 'Wybierz', 'id': 0}
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def add_expense(self, name_field, date_field, description_field, amount_field):
+        name = name_field.text
+        date = date_field.text
+        description = description_field.text
+        amount = amount_field.text
+
+        if self.validate_input(name, date, description, amount):
+            expense_id = self.check_in_database(name, date, description, amount)
+            if expense_id != {}:
+                print('expense succesfully added')
+                self.clear_input_fields()
+                self.show_message(f'Wydatek {name} został dodany.')
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
 
 
 class LoginScreen(Screen):
@@ -219,13 +433,144 @@ class CreateAccountScreen(Screen):
 class ExpensesListScreen(Screen):
     def on_pre_enter(self, *args):
         box = self.ids.box
-        for i in range(100):
-            box.add_widget(SelectableLabel(text='TestItem', label_id=i))
+        expenses_list = self.get_expenses_list()
+        for expense in expenses_list:
+            box.add_widget(SelectableLabel(text=f"{expense['expense_name']} - "
+                                                f"{round(expense['amount'], 2)} zł - "
+                                                f"{expense['operation_date'].strftime('%d.%m.%Y')}"
+                                           , label_id=expense['expense_id']))
+
+    def on_pre_leave(self, *args):
+        self.ids.box.clear_widgets()
+        
+    def get_expenses_list(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        print('Próbuję pobrać listę wydatków')
+        expenses_list = db_manager.get_all_expenses(app.root.account_id)
+        print(expenses_list)
+        return expenses_list
+
+
+class CreateGroupScreen(Screen):
+    users_ids = ListProperty({})
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name, description, settlement_percent, settlement_value):
+        return self.validate_name(name) \
+               and self.validate_description(description) \
+               and self.validate_type(settlement_percent, settlement_value) \
+               and self.validate_users_list()
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa grupy powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_description(self, description):
+        valid = False
+        if len(description) > 255:
+            self.show_message('Opis nie powinien przekroczyć 255 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_type(self, settlement_percent, settlement_value):
+        valid = False
+        if settlement_percent.state == 'normal' and settlement_value.state == 'normal':
+            self.show_message('Wybierz typ rozliczenia dla grupy.')
+        elif settlement_percent.state == 'down' and settlement_value.state == 'down':
+            self.show_message('Można wybrać tylko jeden typ rozliczenia.')
+        else:
+            valid = True
+        return valid
+
+    def validate_users_list(self):
+        valid = False
+        if len(self.users_ids) < 1:
+            self.show_message('Nie można utworzyć pustej grupy.')
+        else:
+            valid = True
+        return valid
+
+    def check_in_database(self, name, description, settlement_percent):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        settlement_type_id = 1 if settlement_percent.state == 'down' else 2
+        print('Próbuję dodać grupę')
+        group_id = db_manager.create_group(app.root.account_id, name, description, settlement_type_id, is_main_group=False)
+        print(app.root.account_id, name, description, settlement_type_id)
+        print(group_id)
+        return group_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+        self.ids.description.text = ''
+        self.ids.settlement_percent.state = 'down'
+        self.ids.settlement_value.state = 'normal'
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def add_group(self, name_field, description_field, settlement_percent, settlement_value):
+        name = name_field.text
+        description = description_field.text
+
+        if self.validate_input(name, description, settlement_percent, settlement_value):
+            group_id = self.check_in_database(name, description, settlement_percent)
+            if group_id != {}:
+                print('group succesfully added')
+                self.clear_input_fields()
+                self.show_message(f'Grupa {name} została dodana.')
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
 
 
 class ExpenseDetailsScreen(Screen):
+    expense = ObjectProperty(None)
+
     def on_pre_enter(self, *args):
-        pass
+        self.expense = self.check_in_database(App.get_running_app().root.label_id)
+        self.populate_fields()
+
+    def on_pre_leave(self, *args):
+        self.clear_fields()
+
+    def check_in_database(self, expense_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać wydatek')
+        expense = db_manager.get_expense(expense_id)
+        print(expense)
+        return expense
+
+    def populate_fields(self):
+        self.ids.name.text = self.expense['expense_name']
+        self.ids.date.text = self.expense['operation_date'].strftime('%d.%m.%Y')
+        self.ids.description.text = self.expense['description']
+        self.ids.payer.text = self.expense['username']
+        self.ids.group.text = self.expense['group_name']
+        self.ids.category.text = self.expense['category_name']
+        self.ids.amount.text = str(round(self.expense['amount'], 2)) + ' zł'
+        self.ids.payment_method.text = self.expense['payment_method_name']
+
+    def clear_fields(self):
+        self.ids.name.text = ''
+        self.ids.date.text = ''
+        self.ids.description.text = ''
+        self.ids.payer.text = ''
+        self.ids.group.text = ''
+        self.ids.category.text = ''
+        self.ids.amount.text = ''
+        self.ids.payment_method.text = ''
 
 
 class CreateCategoryScreen(Screen):
@@ -482,3 +827,6 @@ class MyApp(App):
 
 if __name__ == "__main__":
     MyApp().run()
+    date = "20.03.2020"
+    date = datetime.datetime.strptime(date, '%d.%m.%Y')
+    print(date)

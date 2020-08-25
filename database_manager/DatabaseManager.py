@@ -69,6 +69,8 @@ class DatabaseManager:
                        category_id, amount, payment_method_id, group_id):
         expense_id = self.__insert_expense(operation_date, name, description, payer_id,
                                            category_id, amount, payment_method_id, group_id)
+        if expense_id is None:
+            expense_id = {}
         return expense_id
 
     def create_income(self, operation_date, name, description, category_id, amount, group_id):

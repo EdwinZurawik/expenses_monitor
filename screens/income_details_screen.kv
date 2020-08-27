@@ -1,5 +1,5 @@
-<ExpenseDetailsScreen>:
-    name: 'expense_details_screen'
+<IncomeDetailsScreen>:
+    name: 'income_details_screen'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -92,40 +92,7 @@
                         font_size: 20
                         size_hint_y: None
                         height: 30
-                        text: 'Zapłacone przez:'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Label:
-                        id: payer
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    spacing: 10
-                    padding: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Grupa:'
+                        text: 'Kto otrzymał:'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -211,39 +178,6 @@
                                 size: self.size
                 BoxLayout:
                     size_hint_y: None
-                    height: 40
-                    spacing: 10
-                    padding: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Metoda płatności:'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Label:
-                        id: payment_method
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                BoxLayout:
-                    size_hint_y: None
                     height: 50
                     padding_y: 20
                     spacing: 10
@@ -288,7 +222,7 @@
                         size_hint_y: None
                         height: 30
                         text: 'Powrót'
-                        on_release: app.root.current = 'expenses_list_screen'
+                        on_release: app.root.current = 'incomes_list_screen'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -297,13 +231,3 @@
                                 size: self.size
                     Widget:
                 Widget:
-
-
-<ScrollableLabel>:
-    text: str('hello '*100)
-    Label:
-        text: root.text
-        font_size: 20
-        text_size: self.width, None
-        size_hint_y: None
-        height: self.texture_size[1]

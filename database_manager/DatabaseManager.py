@@ -75,6 +75,8 @@ class DatabaseManager:
 
     def create_income(self, operation_date, name, description, category_id, amount, group_id):
         income_id = self.__insert_income(operation_date, name, description, category_id, amount, group_id)
+        if income_id is None:
+            income_id = {}
         return income_id
 
     def create_payment_method(self, account_id, name):
@@ -276,11 +278,12 @@ class DatabaseManager:
                     'operation_date': row[1],
                     'amount': row[2],
                     'income_name': row[3],
-                    'category_name': row[4],
-                    'group_name': row[5],
-                    'category_id': row[6],
-                    'group_id': row[7],
-                    'settlement_type_id': row[8]
+                    'description': row[4],
+                    'category_name': row[5],
+                    'group_name': row[6],
+                    'category_id': row[7],
+                    'group_id': row[8],
+                    'settlement_type_id': row[9]
                 }
             )
         return results
@@ -296,11 +299,12 @@ class DatabaseManager:
                     'operation_date': row[1],
                     'amount': row[2],
                     'income_name': row[3],
-                    'category_name': row[4],
-                    'group_name': row[5],
-                    'category_id': row[6],
-                    'group_id': row[7],
-                    'settlement_type_id': row[8]
+                    'description': row[4],
+                    'category_name': row[5],
+                    'group_name': row[6],
+                    'category_id': row[7],
+                    'group_id': row[8],
+                    'settlement_type_id': row[9]
                 }
             )
         return results
@@ -438,11 +442,12 @@ class DatabaseManager:
                     'operation_date': data[1],
                     'amount': data[2],
                     'income_name': data[3],
-                    'category_name': data[4],
-                    'group_name': data[5],
-                    'category_id': data[6],
-                    'group_id': data[7],
-                    'settlement_type_id': data[8]
+                    'description': data[4],
+                    'category_name': data[5],
+                    'group_name': data[6],
+                    'category_id': data[7],
+                    'group_id': data[8],
+                    'settlement_type_id': data[9]
                 }
         return result
 
@@ -954,6 +959,7 @@ class DatabaseManager:
                'i.operationDate, '
                'i.amount, '
                'i.name, '
+               'i.description, '
                'c.name, '
                'g.name, '
                'c.categoryId, '
@@ -993,6 +999,7 @@ class DatabaseManager:
                'i.operationDate, '
                'i.amount, '
                'i.name, '
+               'i.description, '
                'c.name, '
                'g.name, '
                'c.categoryId, '
@@ -1238,7 +1245,7 @@ class DatabaseManager:
                'INNER JOIN group_tbl g '
                'ON i.groupId=g.groupId '
                'WHERE '
-               'g.accountId=%s ')
+               'i.incomeId=%s ')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (income_id,))

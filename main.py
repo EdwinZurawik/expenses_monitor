@@ -5,6 +5,7 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
 
 from database_manager.DatabaseManager import DatabaseManager
+from reports import BalanceReport, PaymentMethodReport, SettlementReport
 from configuration_data import ConfigurationData
 import mysql.connector
 
@@ -45,6 +46,15 @@ class MyScreenManager(ScreenManager):
 
 class MenuScreen(Screen):
     pass
+
+
+class ReportsListScreen(Screen):
+
+    def generate_balance_report(self):
+        account_id = App.get_running_app().root.account_id
+        report = BalanceReport.BalanceReport()
+        data = report.generate_report_data(account_id, 20, datetime.datetime(2010, 10, 1), datetime.datetime(2040, 10, 1))
+        print(data)
 
 
 class ButtonWithData(Button):

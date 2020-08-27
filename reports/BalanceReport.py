@@ -11,8 +11,7 @@ class BalanceReport:
         report_data = {'report_group': report_group, 'operations': []}
 
         for operation in operations_list:
-            settlement_type_id = operation['settlement_type_id']
-            group = self.manager.get_settlement_rule_users(operation['settlement_rule_id'])
+            group = self.manager.get_all_users_from_group(operation['group_id'])
             category_type_id = self.manager.get_category(operation['category_id'])['category_type_id']
 
             report_data['operations'].append(
@@ -21,7 +20,7 @@ class BalanceReport:
                     'category_type_id': category_type_id,
                     'group': group,
                     'amount': operation['amount'],
-                    'settlement_type_id': settlement_type_id
+                    'settlement_type_id': operation['settlement_type_id']
                 }
             )
         return report_data
@@ -65,6 +64,7 @@ class BalanceReport:
         balance = 0
 
         for member in group:
+            print(member)
             member_id = member['user_id']
             member_percent = member['amount']
 

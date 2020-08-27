@@ -1,0 +1,309 @@
+<ExpenseDetailsScreen>:
+    name: 'expense_details_screen'
+    FloatLayout:
+        FloatLayout:
+            size_hint: None, None
+            size: root.width * 0.9, root.height * 0.9
+            center: self.parent.center
+            canvas:
+                Color:
+                    rgba: 0.5, 0.5, 0.5, 0.5
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            BoxLayout:
+                orientation: 'vertical'
+                pos: self.parent.pos
+                canvas:
+                    Color:
+                        rgba: 1, 0, 0, 0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Widget:
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        id: name
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Nazwa'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        id: date
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                FloatLayout:
+                    size_hint_y: None
+                    height: 100
+                    center: self.parent.center
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    BoxLayout:
+                        padding: 10
+                        pos: self.parent.pos
+                        ScrollableLabel:
+                            id: description
+                            pos: self.parent.pos
+                            canvas:
+                                Color:
+                                    rgba: 0.2, 0.1, 0.3, 0.5
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    spacing: 10
+                    padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Zapłacone przez:'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        id: payer
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    spacing: 10
+                    padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Grupa:'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        id: group
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    spacing: 10
+                    padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Kategoria:'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        id: category
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    spacing: 10
+                    padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Kwota:'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        id: amount
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    spacing: 10
+                    padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Metoda płatności:'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        id: payment_method
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 50
+                    padding_y: 20
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        size_hint_x: 0.5
+                        height: 30
+                        text: 'Edytuj'
+                        on_release:
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        size_hint_x: 0.5
+                        height: 30
+                        text: 'Usuń'
+                        on_release:
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    Widget:
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Powrót'
+                        on_release: app.root.current = 'expenses_list_screen'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Widget:
+                Widget:
+
+
+<ScrollableLabel>:
+    text: str('hello '*100)
+    Label:
+        text: root.text
+        font_size: 20
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]

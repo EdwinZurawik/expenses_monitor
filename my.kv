@@ -1,0 +1,36 @@
+#: include screens/login_screen.kv
+#: include screens/create_account_screen.kv
+#: include screens/menu_screen.kv
+#: include screens/expenses_list_screen.kv
+#: include screens/expense_details_screen.kv
+#: include screens/create_category_screen.kv
+#: include screens/create_user_screen.kv
+#: include screens/create_payment_method_screen.kv
+#: include screens/create_expense_screen.kv
+#: include screens/ip_address_screen.kv
+#: include screens/create_group_screen.kv
+
+#: import NoTransition kivy.uix.screenmanager.NoTransition
+
+<MyScreenManager>:
+    transition: NoTransition()
+    #IpAddressScreen: #not needed for now
+    LoginScreen:
+    CreateAccountScreen:
+    MenuScreen:
+    ExpensesListScreen:
+    ExpenseDetailsScreen:
+    CreateCategoryScreen:
+    CreateUserScreen:
+    CreatePaymentMethodScreen:
+    CreateExpenseScreen:
+    CreateGroupScreen:
+
+
+<SelectableLabel>:
+    canvas:
+        Color:
+            rgba: 1, 1, 0, 0.5
+        Rectangle:
+            pos: self.pos
+            size: self.size

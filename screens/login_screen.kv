@@ -1,0 +1,147 @@
+<LoginScreen>:
+    name: 'login_screen'
+    FloatLayout:
+        FloatLayout:
+            size_hint: None, None
+            size: root.width * 0.9, root.height * 0.9
+            center: self.parent.center
+            canvas:
+                Color:
+                    rgba: 0.5, 0.5, 0.5, 0.5
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            BoxLayout:
+                orientation: 'vertical'
+                pos: self.parent.pos
+                canvas:
+                    Color:
+                        rgba: 1, 0, 0, 0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Widget:
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Nazwa konta'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    TextInput:
+                        id: username
+                        multiline: False
+                        font_size: 15
+                        size_hint_y: None
+                        height: 30
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    spacing: 10
+                    padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Hasło'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    TextInput:
+                        id: password
+                        multiline: False
+                        password: True
+                        font_size: 15
+                        size_hint_y: None
+                        height: 30
+                BoxLayout:
+                    size_hint_y: None
+                    height: 50
+                    padding_y: 20
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        size_hint_x: 0.7
+                        height: 30
+                        text: 'Nie masz konta? Zarejestruj się'
+                        on_release: app.root.current = 'create_account_screen'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        size_hint_x: 0.3
+                        height: 30
+                        text: 'Zaloguj się'
+                        on_release: root.login(root.ids.username, root.ids.password)
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    Widget:
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Wyjdź'
+                        on_release: app.stop()
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Widget:
+                Widget:
+                Label:
+                    id: message
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
+                    text: ''
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size

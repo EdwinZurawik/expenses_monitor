@@ -28,7 +28,7 @@
                     font_size: 20
                     height: 30
                     text: 'Raport bilansu'
-                    on_release: root.generate_balance_report()
+                    on_release: app.root.current = 'balance_report_screen'
                     canvas:
                         Color:
                             rgba: 1, 0, 0, 0.5
@@ -40,7 +40,7 @@
                     font_size: 20
                     height: 30
                     text: 'Raport rozliczenia'
-                    on_release:
+                    on_release: app.root.current = 'settlement_report_screen'
                     canvas:
                         Color:
                             rgba: 1, 0, 0, 0.5
@@ -52,7 +52,7 @@
                     font_size: 20
                     height: 30
                     text: 'Raport metod płatności'
-                    on_release:
+                    on_release: app.root.current = 'payment_method_report_screen'
                     canvas:
                         Color:
                             rgba: 1, 0, 0, 0.5

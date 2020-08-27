@@ -64,7 +64,6 @@ class BalanceReport:
         balance = 0
 
         for member in group:
-            print(member)
             member_id = member['user_id']
             member_percent = member['amount']
 

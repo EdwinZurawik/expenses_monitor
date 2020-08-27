@@ -13,7 +13,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
-from kivy.properties import NumericProperty, ObjectProperty, ListProperty
+from kivy.properties import NumericProperty, ObjectProperty, ListProperty, DictProperty
 from kivy.properties import StringProperty
 from kivy.uix.button import Button
 
@@ -53,7 +53,6 @@ class ButtonWithData(Button):
 
 
 class FloatInput(TextInput):
-
     pat = re.compile('[^0-9]')
 
     def insert_text(self, substring, from_undo=False):
@@ -65,17 +64,35 @@ class FloatInput(TextInput):
         return super(FloatInput, self).insert_text(s, from_undo=from_undo)
 
 
+class IntegerInput(TextInput):
+    pat = re.compile('[^0-9]')
+
+    def insert_text(self, substring, from_undo=False):
+        pat = self.pat
+        s = re.sub(pat, '', substring)
+        return super(IntegerInput, self).insert_text(s, from_undo=from_undo)
+
+
 class CreateExpenseScreen(Screen):
     payer_id = NumericProperty(0)
     group_id = NumericProperty(0)
     category_id = NumericProperty(0)
     payment_method_id = NumericProperty(0)
+    payers_dropdown = DropDown()
+    groups_dropdown = DropDown()
+    categories_dropdown = DropDown()
+    payment_methods_dropdown = DropDown()
 
     def on_pre_leave(self, *args):
         self.clear_input_fields()
 
+    def on_pre_enter(self, *args):
+        self.add_payers_dropdown()
+        self.add_groups_dropdown()
+        self.add_categories_dropdown()
+        self.add_payment_methods_dropdown()
+
     def add_payers_dropdown(self):
-        payers_dropdown = DropDown()
         db_manager = App.get_running_app().db_manager
         app = App.get_running_app()
 
@@ -86,14 +103,13 @@ class CreateExpenseScreen(Screen):
                                  size_hint_y=None,
                                  height='30',
                                  button_data={'text': user['username'], 'id': user['user_id']})
-            btn.bind(on_release=lambda btn: payers_dropdown.select(btn.button_data))
-            payers_dropdown.add_widget(btn)
+            btn.bind(on_release=lambda btn: self.payers_dropdown.select(btn.button_data))
+            self.payers_dropdown.add_widget(btn)
         payers_btn = self.ids.payers_btn
-        payers_btn.bind(on_release=payers_dropdown.open)
-        payers_dropdown.bind(on_select=lambda instance, x: setattr(payers_btn, 'button_data', x))
+        payers_btn.bind(on_release=self.payers_dropdown.open)
+        self.payers_dropdown.bind(on_select=lambda instance, x: setattr(payers_btn, 'button_data', x))
 
     def add_groups_dropdown(self):
-        groups_dropdown = DropDown()
         db_manager = App.get_running_app().db_manager
         app = App.get_running_app()
 
@@ -104,32 +120,31 @@ class CreateExpenseScreen(Screen):
                                  size_hint_y=None,
                                  height='30',
                                  button_data={'text': group['name'], 'id': group['group_id']})
-            btn.bind(on_release=lambda btn: groups_dropdown.select(btn.button_data))
-            groups_dropdown.add_widget(btn)
+            btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
+            self.groups_dropdown.add_widget(btn)
         groups_btn = self.ids.groups_btn
-        groups_btn.bind(on_release=groups_dropdown.open)
-        groups_dropdown.bind(on_select=lambda instance, x: setattr(groups_btn, 'button_data', x))
+        groups_btn.bind(on_release=self.groups_dropdown.open)
+        self.groups_dropdown.bind(on_select=lambda instance, x: setattr(groups_btn, 'button_data', x))
 
     def add_categories_dropdown(self):
-        categories_dropdown = DropDown()
         db_manager = App.get_running_app().db_manager
         app = App.get_running_app()
 
         categories_list = db_manager.get_all_categories(app.root.account_id)
 
         for category in categories_list:
-            btn = ButtonWithData(text=category['name'],
-                                 size_hint_y=None,
-                                 height='30',
-                                 button_data={'text': category['name'], 'id': category['category_id']})
-            btn.bind(on_release=lambda btn: categories_dropdown.select(btn.button_data))
-            categories_dropdown.add_widget(btn)
+            if category['category_type_id'] == 1:
+                btn = ButtonWithData(text=category['name'],
+                                     size_hint_y=None,
+                                     height='30',
+                                     button_data={'text': category['name'], 'id': category['category_id']})
+                btn.bind(on_release=lambda btn: self.categories_dropdown.select(btn.button_data))
+                self.categories_dropdown.add_widget(btn)
         categories_btn = self.ids.categories_btn
-        categories_btn.bind(on_release=categories_dropdown.open)
-        categories_dropdown.bind(on_select=lambda instance, x: setattr(categories_btn, 'button_data', x))
+        categories_btn.bind(on_release=self.categories_dropdown.open)
+        self.categories_dropdown.bind(on_select=lambda instance, x: setattr(categories_btn, 'button_data', x))
 
     def add_payment_methods_dropdown(self):
-        payment_methods_dropdown = DropDown()
         db_manager = App.get_running_app().db_manager
         app = App.get_running_app()
 
@@ -139,12 +154,13 @@ class CreateExpenseScreen(Screen):
             btn = ButtonWithData(text=payment_method['name'],
                                  size_hint_y=None,
                                  height='30',
-                                 button_data={'text': payment_method['name'], 'id': payment_method['payment_method_id']})
-            btn.bind(on_release=lambda btn: payment_methods_dropdown.select(btn.button_data))
-            payment_methods_dropdown.add_widget(btn)
+                                 button_data={'text': payment_method['name'],
+                                              'id': payment_method['payment_method_id']})
+            btn.bind(on_release=lambda btn: self.payment_methods_dropdown.select(btn.button_data))
+            self.payment_methods_dropdown.add_widget(btn)
         payment_methods_btn = self.ids.payment_methods_btn
-        payment_methods_btn.bind(on_release=payment_methods_dropdown.open)
-        payment_methods_dropdown.bind(on_select=lambda instance, x: setattr(payment_methods_btn, 'button_data', x))
+        payment_methods_btn.bind(on_release=self.payment_methods_dropdown.open)
+        self.payment_methods_dropdown.bind(on_select=lambda instance, x: setattr(payment_methods_btn, 'button_data', x))
 
     def set_payer_id(self):
         self.payer_id = self.ids.payers_btn.button_data['id']
@@ -167,7 +183,7 @@ class CreateExpenseScreen(Screen):
                and self.validate_description(description) \
                and self.validate_payer_id() \
                and self.validate_group_id() \
-               and self.validate_category_id()\
+               and self.validate_category_id() \
                and self.validate_amount(amount) \
                and self.validate_payment_method_id()
 
@@ -442,7 +458,7 @@ class ExpensesListScreen(Screen):
 
     def on_pre_leave(self, *args):
         self.ids.box.clear_widgets()
-        
+
     def get_expenses_list(self):
         db_manager = App.get_running_app().db_manager
         app = App.get_running_app()
@@ -453,10 +469,63 @@ class ExpensesListScreen(Screen):
 
 
 class CreateGroupScreen(Screen):
-    users_ids = ListProperty({})
+    users_dropdowns = DictProperty({})
+    highest_id = 0
 
     def on_pre_leave(self, *args):
         self.clear_input_fields()
+
+    def add_user_field(self):
+        self.highest_id += 1
+        deletebtn = ButtonWithData(text='-', size_hint_x=0.25, id=f'delete{self.highest_id}')
+        userbtn = ButtonWithData(button_data={'text': 'Wybierz', 'id': 0},
+                                 size_hint_x=0.35, id=f'user{self.highest_id}')
+        widgets = [userbtn,
+                   FloatInput(text='', font_size=8, size_hint_x=0.30, id=f'amount{self.highest_id}'),
+                   IntegerInput(text='', font_size=8, size_hint_x=0.10, id=f'priority{self.highest_id}'),
+                   deletebtn]
+        deletebtn.bind(on_release=lambda btn: self.remove_user_field(btn.id))
+
+        for widget in widgets:
+            self.ids.box.add_widget(widget)
+
+        new_dropdown = DropDown()
+        self.users_dropdowns[f'{self.highest_id}'] = new_dropdown
+        self.populate_users_dropdown(str(self.highest_id))
+        userbtn.bind(on_release=self.users_dropdowns[str(self.highest_id)].open)
+        self.users_dropdowns[str(self.highest_id)].bind(
+            on_select=lambda instance, x: setattr(userbtn, 'button_data', x))
+
+    def remove_user_field(self, id):
+        id_regex = re.compile(r'([0-9]+)')
+        id_match = re.search(id_regex, id)
+
+        names = ['user', 'amount', 'priority', 'delete']
+
+        for i in range(len(names)):
+            names[i] = names[i] + str(id_match.group(1))
+        box = self.ids.box
+
+        for child in box.children[:]:
+            if child.id in names:
+                box.remove_widget(child)
+
+        self.users_dropdowns.pop(str(id_match.group(1)))
+
+    def populate_users_dropdown(self, id):
+
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        self.users_dropdowns[id].clear_widgets()
+        users_list = db_manager.get_all_users(app.root.account_id)
+
+        for user in users_list:
+            btn = ButtonWithData(text=user['username'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': user['username'], 'id': user['user_id']})
+            btn.bind(on_release=lambda btn: self.users_dropdowns[id].select(btn.button_data))
+            self.users_dropdowns[id].add_widget(btn)
 
     def clear_message(self):
         self.ids.message.text = ''
@@ -465,7 +534,7 @@ class CreateGroupScreen(Screen):
         return self.validate_name(name) \
                and self.validate_description(description) \
                and self.validate_type(settlement_percent, settlement_value) \
-               and self.validate_users_list()
+               and self.validate_users_list(settlement_percent)
 
     def validate_name(self, name):
         valid = False
@@ -493,22 +562,132 @@ class CreateGroupScreen(Screen):
             valid = True
         return valid
 
-    def validate_users_list(self):
+    def validate_users_list(self, settlement_percent):
         valid = False
-        if len(self.users_ids) < 1:
+        all_users_valid = True
+        number_of_users = 0
+        users_list = []
+        priority_list = []
+        total_amount = 0
+        box = self.ids.box
+
+        for child in box.children[:]:
+            if child.id is not None and 'user' in child.id:
+                if self.validate_user(child, users_list):
+                    users_list.append(child.button_data['id'])
+                    number_of_users = number_of_users + 1
+                else:
+                    all_users_valid = False
+                    break
+            elif child.id is not None and 'amount' in child.id:
+                if self.validate_amount(child):
+                    total_amount = total_amount + float(child.text)
+                else:
+                    all_users_valid = False
+                    break
+            elif child.id is not None and 'priority' in child.id:
+                if self.validate_priority(child, priority_list):
+                    priority_list.append(int(child.text))
+                else:
+                    all_users_valid = False
+                    break
+
+        if not all_users_valid:
+            pass
+        elif number_of_users < 1:
             self.show_message('Nie można utworzyć pustej grupy.')
+        elif settlement_percent.state == 'down' and total_amount != 100:
+            self.show_message('Dla rozliczenia procentowego suma procent członków grupy musi wynosić 100.')
+
         else:
             valid = True
         return valid
+
+    def validate_user(self, user, users_list):
+        user_valid = False
+        print(users_list)
+        print('Validating user:', user.button_data)
+        if user.button_data['id'] == 0:
+            self.show_message('Uzupełnij dane wszystkich członków grupy.')
+            print('user id', user.button_data['id'])
+        elif user.button_data['id'] in users_list:
+            self.show_message('Wykryto zduplikowaną wartość "Użytkownik".')
+        else:
+            user_valid = True
+        return user_valid
+
+    def validate_amount(self, amount):
+        amount_valid = False
+        if amount.text == '':
+            self.show_message('Uzupełnij dane wszystkich członków grupy.')
+            print('amount', amount.text)
+        else:
+            amount_valid = True
+        return amount_valid
+
+    def validate_priority(self, priority, priority_list):
+        priority_valid = False
+        if priority.text == '':
+            self.show_message('Uzupełnij dane wszystkich członków grupy.')
+            print('priority', priority.text)
+        elif int(priority.text) in priority_list:
+            self.show_message('Wykryto zduplikowaną wartość "priorytet".')
+        else:
+            priority_valid = True
+        return priority_valid
 
     def check_in_database(self, name, description, settlement_percent):
         db_manager = App.get_running_app().db_manager
         app = App.get_running_app()
         settlement_type_id = 1 if settlement_percent.state == 'down' else 2
         print('Próbuję dodać grupę')
-        group_id = db_manager.create_group(app.root.account_id, name, description, settlement_type_id, is_main_group=False)
+        group_id = db_manager.create_group(app.root.account_id, name, description, settlement_type_id,
+                                           is_main_group=False)
         print(app.root.account_id, name, description, settlement_type_id)
         print(group_id)
+
+        # adding users to user_group_tbl
+        box = self.ids.box
+        child_id_regex = re.compile(r'([0-9])+')
+
+        # collecting data
+
+        data = {}
+
+        for child in box.children:
+            if child.id is None:
+                pass
+            elif 'user' in child.id:
+                print('CHILD ID:', child.id)
+                id = re.search(child_id_regex, child.id).group(1)
+                if id in data:
+                    data[id]['user'] = int(child.button_data['id'])
+                else:
+                    data[id] = {}
+                    data[id]['user'] = int(child.button_data['id'])
+            elif 'amount' in child.id:
+                print('CHILD ID:', child.id)
+                id = re.search(child_id_regex, child.id).group(1)
+                if id in data:
+                    data[id]['amount'] = int(child.text)
+                else:
+                    data[id] = {}
+                    data[id]['amount'] = int(child.text)
+            elif 'priority' in child.id:
+                print('CHILD ID:', child.id)
+                id = re.search(child_id_regex, child.id).group(1)
+                if id in data:
+                    data[id]['priority'] = int(child.text)
+                else:
+                    data[id] = {}
+                    data[id]['priority'] = int(child.text)
+
+        # adding users to group
+        print('data:', data)
+        for k, v in data.items():
+            print(f'Próbuję dodać usera: {v["user"]} do grupy')
+            db_manager.add_user_to_group(v['user'], group_id, v['amount'], v['priority'])
+
         return group_id
 
     def clear_input_fields(self):
@@ -517,6 +696,9 @@ class CreateGroupScreen(Screen):
         self.ids.description.text = ''
         self.ids.settlement_percent.state = 'down'
         self.ids.settlement_value.state = 'normal'
+        self.highest_id = 0
+        self.ids.box.clear_widgets()
+        self.users_dropdowns = {}
 
     def show_message(self, message):
         self.ids.message.text = message
@@ -827,6 +1009,3 @@ class MyApp(App):
 
 if __name__ == "__main__":
     MyApp().run()
-    date = "20.03.2020"
-    date = datetime.datetime.strptime(date, '%d.%m.%Y')
-    print(date)

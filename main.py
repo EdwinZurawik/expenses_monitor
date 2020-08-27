@@ -153,6 +153,7 @@ class BalanceReportScreen(Screen):
                 box.add_widget(Label(text=item, halign='left'))
             self.ids.summary.text = f'Suma wydatków: {report_data["summary"]["expenses"]} zł ' \
                                     f'/ Suma przychodów: {report_data["summary"]["incomes"]} zł.'
+            self.show_message('')
 
     def generate_balance_report(self, date_from, date_to):
         account_id = App.get_running_app().root.account_id
@@ -279,6 +280,7 @@ class SettlementReportScreen(Screen):
 
             for item in report_data:
                 box.add_widget(Label(text=item, halign='left'))
+            self.show_message('')
 
     def generate_settlement_report(self, date_from, date_to):
         account_id = App.get_running_app().root.account_id
@@ -393,6 +395,7 @@ class PaymentMethodReportScreen(Screen):
 
             for item in report_data:
                 box.add_widget(Label(text=item, halign='left'))
+            self.show_message('')
 
     def generate_payment_method_report(self, date_from, date_to):
         account_id = App.get_running_app().root.account_id
@@ -1034,8 +1037,8 @@ class CreateGroupScreen(Screen):
         userbtn = ButtonWithData(button_data={'text': 'Wybierz', 'id': 0},
                                  size_hint_x=0.35, id=f'user{self.highest_id}')
         widgets = [userbtn,
-                   FloatInput(text='', font_size=8, size_hint_x=0.30, id=f'amount{self.highest_id}'),
-                   IntegerInput(text='', font_size=8, size_hint_x=0.10, id=f'priority{self.highest_id}'),
+                   FloatInput(text='', font_size=18, size_hint_x=0.30, id=f'amount{self.highest_id}'),
+                   IntegerInput(text='', font_size=18, size_hint_x=0.10, id=f'priority{self.highest_id}'),
                    deletebtn]
         deletebtn.bind(on_release=lambda btn: self.remove_user_field(btn.id))
 

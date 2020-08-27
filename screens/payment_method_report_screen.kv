@@ -1,0 +1,210 @@
+<PaymentMethodReportScreen>:
+    name: 'payment_method_report_screen'
+    FloatLayout:
+        FloatLayout:
+            size_hint: None, None
+            size: root.width * 0.9, root.height * 0.9
+            center: self.parent.center
+            canvas:
+                Color:
+                    rgba: 0.5, 0.5, 0.5, 0.5
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            BoxLayout:
+                orientation: 'vertical'
+                pos: self.parent.pos
+                canvas:
+                    Color:
+                        rgba: 1, 0, 0, 0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Widget:
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Widget:
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Raport metod płatności'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Widget:
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Początkowa data'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    TextInput:
+                        id: date_from
+                        multiline: False
+                        font_size: 15
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Końcowa data'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    TextInput:
+                        id: date_to
+                        multiline: False
+                        font_size: 15
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    spacing: 10
+                    padding: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Grupa:'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    ButtonWithData:
+                        id: groups_btn
+                        text: 'Wybierz'
+                        Widget:
+                BoxLayout:
+                    size_hint_y: None
+                    height: 50
+                    padding_y: 20
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        size_hint_x: 0.5
+                        height: 30
+                        text: 'Powrót'
+                        on_release: app.root.current = 'reports_list_screen'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Button:
+                        font_size: 20
+                        size_hint_y: None
+                        size_hint_x: 0.5
+                        height: 30
+                        text: 'Generuj raport'
+                        on_release: root.print_payment_method_report(date_from, date_to)
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                Widget:
+                    size_hint_y: 0.5
+                ScrollView:
+                    size_hint_y: 3
+                    GridLayout:
+                        spacing: 5
+                        cols: 1
+                        orientation: 'vertical'
+                        col_default_width: self.width
+                        row_default_height: 20
+                        size_hint_y:None
+                        height: self.minimum_height
+                        id: box
+                        canvas:
+                            Color:
+                                rgba: 0.58, 0.59, 1.00, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                Widget:
+                Label:
+                    id: message
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
+                    text: ''
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size

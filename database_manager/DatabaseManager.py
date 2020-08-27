@@ -145,7 +145,9 @@ class DatabaseManager:
                     'user_id': row[0],
                     'username': row[1],
                     'main_group_id': row[2],
-                    'account_id': row[3]
+                    'account_id': row[3],
+                    'amount': row[4],
+                    'priority': row[5]
                 }
             )
         return results
@@ -756,8 +758,8 @@ class DatabaseManager:
                'ug.amount, '
                'ug.priority '
                'FROM user_tbl u '
-               'JOIN user_group_tbl ug'
-               'ON u.user_id=ug.user_id'
+               'JOIN user_group_tbl ug '
+               'ON u.userId=ug.userId '
                'WHERE '
                'ug.groupId=%s '
                f'ORDER BY {order_by}')
@@ -765,6 +767,8 @@ class DatabaseManager:
             self.connect_to_db()
             self.cursor.execute(sql, (group_id,))
             results = self.cursor.fetchall()
+            if results is None:
+                results = {}
             return results
         except mysql.connector.Error as err:
             print(err.msg)

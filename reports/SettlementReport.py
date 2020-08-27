@@ -10,15 +10,14 @@ class SettlementReport:
         report_data = {'report_group': report_group, 'expenses': []}
 
         for expense in expenses_list:
-            settlement_type_id = expense['settlement_type_id']
-            group = self.manager.get_settlement_rule_users(expense['settlement_rule_id'])
+            group = self.manager.get_all_users_from_group(expense['group_id'])
 
             report_data['expenses'].append(
                 {
                     'payer_id': expense['user_id'],
                     'group': group,
                     'amount': expense['amount'],
-                    'settlement_type_id': settlement_type_id
+                    'settlement_type_id': expense['settlement_type_id']
                 }
             )
         return report_data

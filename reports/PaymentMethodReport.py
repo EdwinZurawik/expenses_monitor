@@ -6,7 +6,7 @@ class PaymentMethodReport:
 
     def get_data_from_db(self, account_id, report_group_id, date_from, date_to):
         expenses_list = self.manager.get_all_expenses_between_dates(account_id, date_from, date_to)
-        report_group = self.manager.get_all_users_from_group(report_group_id)
+        report_group = self.manager.get_all_users_from_group(report_group_id, order_by='priority')
         report_data = {'report_group': report_group, 'payment_methods': []}
 
         for expense in expenses_list:

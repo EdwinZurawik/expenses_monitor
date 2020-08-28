@@ -99,8 +99,10 @@ class DatabaseManager:
     def edit_category(self, category_id, name, description, category_type_id):
         self.__update_category(category_id, name, description, category_type_id)
 
-    def edit_expense(self, expense_id, operation_date, name, description, amount, payer_id, category_id, group_id):
-        self.__update_expense(expense_id, operation_date, name, description, amount, payer_id, category_id, group_id)
+    def edit_expense(self, expense_id, operation_date, name, description, amount,
+                     payer_id, category_id, group_id, payment_method_id):
+        return self.__update_expense(expense_id, operation_date, name, description, amount,
+                              payer_id, category_id, group_id, payment_method_id)
 
     def edit_income(self, income_id, operation_date, name, description, amount, category_id, group_id):
         self.__update_income(income_id, operation_date, name, description, amount, category_id, group_id)
@@ -652,7 +654,8 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __update_expense(self, expense_id, operation_date, name, description, amount, payer_id, category_id, group_id):
+    def __update_expense(self, expense_id, operation_date, name, description, amount,
+                         payer_id, category_id, group_id, payment_method_id):
         sql = ('UPDATE expense_tbl '
                'SET '
                'operationDate = %s, '
@@ -661,17 +664,21 @@ class DatabaseManager:
                'amount = %s, '
                'payerId = %s, '
                'categoryId = %s, '
-               'groupId = %s '
+               'groupId = %s,'
+               'paymentMethodId = %s '
                'WHERE expenseId = %s')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (operation_date, name, description, amount,
-                                      payer_id, category_id, group_id, expense_id))
+                                      payer_id, category_id, group_id,
+                                      payment_method_id, expense_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def __update_income(self, income_id, operation_date, name, description, amount, category_id, group_id):
         sql = ('UPDATE income_tbl '

@@ -6,11 +6,11 @@ class SettlementReport:
 
     def get_data_from_db(self, account_id, report_group_id, date_from, date_to):
         expenses_list = self.manager.get_all_expenses_between_dates(account_id, date_from, date_to)
-        report_group = self.manager.get_all_users_from_group(report_group_id)
+        report_group = self.manager.get_all_users_from_group(report_group_id, order_by='priority')
         report_data = {'report_group': report_group, 'expenses': []}
 
         for expense in expenses_list:
-            group = self.manager.get_all_users_from_group(expense['group_id'])
+            group = self.manager.get_all_users_from_group(expense['group_id'], order_by='priority')
 
             report_data['expenses'].append(
                 {
@@ -27,9 +27,11 @@ class SettlementReport:
         report_data = self.get_data_from_db(account_id, report_group_id, date_from, date_to)
         for row in report_data['expenses']:
             if row['settlement_type_id'] == 1:
-                to_settle = self.settle_by_percent(report_data['report_group'], row['payer_id'], row['group'], row['amount'])
+                to_settle = self.settle_by_percent(report_data['report_group'], row['payer_id'],
+                                                   row['group'], row['amount'])
             elif row['settlement_type_id'] == 2:
-                to_settle = self.settle_by_amount(report_data['report_group'], row['payer_id'], row['group_id'], row['amount'])
+                to_settle = self.settle_by_amount(report_data['report_group'], row['payer_id'],
+                                                  row['group'], row['amount'])
             else:
                 continue
             for k in to_settle:
@@ -70,8 +72,8 @@ class SettlementReport:
         to_settle = {}
 
         for i, member in enumerate(group):
-            member_id = member[1]
-            member_amount = member[2]
+            member_id = member['user_id']
+            member_amount = member['amount']
 
             member_ids = []
             for report_group_member in report_group:

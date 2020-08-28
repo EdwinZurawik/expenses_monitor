@@ -325,14 +325,3 @@
                         Rectangle:
                             pos: self.pos
                             size: self.size
-
-<CustomDropdown>:
-    DropDown:
-        id: payers
-        canvas:
-            Color:
-                rgba: 1, 0, 0, 0.5
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        on_select: mainbtn.text = f'{args[1]}'

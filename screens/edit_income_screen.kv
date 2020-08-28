@@ -1,5 +1,5 @@
-<IncomeDetailsScreen>:
-    name: 'income_details_screen'
+<EditIncomeScreen>:
+    name: 'edit_income_screen'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -33,7 +33,6 @@
                             pos: self.pos
                             size: self.size
                     Label:
-                        id: name
                         font_size: 20
                         size_hint_y: None
                         height: 30
@@ -44,9 +43,44 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
+                    TextInput:
+                        id: name
+                        multiline: False
+                        font_size: 15
+                        size_hint_y: None
+                        height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    size_hint_y: None
+                    height: 40
+                    padding: 10
+                    spacing: 10
+                    canvas:
+                        Color:
+                            rgba: 0, 0, 1, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
                     Label:
-                        id: date
                         font_size: 20
+                        size_hint_y: None
+                        height: 30
+                        text: 'Data'
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    TextInput:
+                        id: date
+                        multiline: False
+                        font_size: 15
                         size_hint_y: None
                         height: 30
                         canvas:
@@ -61,19 +95,35 @@
                     center: self.parent.center
                     canvas:
                         Color:
-                            rgba: 0, 0, 1, 0.5
+                            rgba: 0, 0, 1, 0
                         Rectangle:
                             pos: self.pos
                             size: self.size
                     BoxLayout:
                         padding: 10
+                        spacing: 10
                         pos: self.parent.pos
-                        ScrollableLabel:
+                        BoxLayout:
+                            orientation: 'vertical'
+                            Label:
+                                text: 'Opis'
+                                size_hint_y: None
+                                height: 30
+                                font_size: 20
+                                canvas:
+                                    Color:
+                                        rgba: 1, 0, 0, 0.5
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                            Widget:
+                        TextInput:
                             id: description
-                            pos: self.parent.pos
+                            multiline: True
+                            font_size: 15
                             canvas:
                                 Color:
-                                    rgba: 0.2, 0.1, 0.3, 0.5
+                                    rgba: 1, 0, 0, 0.5
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size
@@ -99,17 +149,10 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    Label:
-                        id: group
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
+                    ButtonWithData:
+                        id: groups_btn
+                        text: 'Wybierz'
+                        Widget:
                 BoxLayout:
                     size_hint_y: None
                     height: 40
@@ -132,17 +175,9 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    Label:
-                        id: category
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
+                    ButtonWithData:
+                        id: categories_btn
+                        text: 'Wybierz'
                 BoxLayout:
                     size_hint_y: None
                     height: 40
@@ -165,11 +200,25 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                    Label:
+                    FloatInput:
                         id: amount
-                        font_size: 20
+                        multiline: False
+                        font_size: 15
+                        size_hint_x: 0.7
                         size_hint_y: None
                         height: 30
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                    Label:
+                        font_size: 20
+                        size_hint_y: None
+                        size_hint_x: 0.3
+                        height: 30
+                        text: 'zł'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -192,8 +241,8 @@
                         size_hint_y: None
                         size_hint_x: 0.5
                         height: 30
-                        text: 'Edytuj'
-                        on_release: app.root.current = 'edit_income_screen'
+                        text: 'Powrót'
+                        on_release: app.root.current = 'income_details_screen'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -205,29 +254,24 @@
                         size_hint_y: None
                         size_hint_x: 0.5
                         height: 30
-                        text: 'Usuń'
-                        on_release:
+                        text: 'Zapisz zmiany'
+                        on_release: root.update_income(root.ids.name, root.ids.date, root.ids.description, root.ids.amount)
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    Widget:
-                    Button:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Powrót'
-                        on_release: app.root.current = 'incomes_list_screen'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Widget:
                 Widget:
+                Label:
+                    id: message
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
+                    text: ''
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size

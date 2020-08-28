@@ -102,10 +102,10 @@ class DatabaseManager:
     def edit_expense(self, expense_id, operation_date, name, description, amount,
                      payer_id, category_id, group_id, payment_method_id):
         return self.__update_expense(expense_id, operation_date, name, description, amount,
-                              payer_id, category_id, group_id, payment_method_id)
+                                     payer_id, category_id, group_id, payment_method_id)
 
     def edit_income(self, income_id, operation_date, name, description, amount, category_id, group_id):
-        self.__update_income(income_id, operation_date, name, description, amount, category_id, group_id)
+        return self.__update_income(income_id, operation_date, name, description, amount, category_id, group_id)
 
     def edit_payment_method(self, payment_method_id, name):
         self.__update_payment_method(payment_method_id, name)
@@ -318,12 +318,12 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'category_id': data[0],
-                    'name': data[1],
-                    'description': data[2],
-                    'category_type_id': data[3],
-                    'account_id': data[4]
-                }
+                'category_id': data[0],
+                'name': data[1],
+                'description': data[2],
+                'category_type_id': data[3],
+                'account_id': data[4]
+            }
         return result
 
     def get_default_income_category(self, account_id):
@@ -344,13 +344,13 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'group_id': data[0],
-                    'name': data[1],
-                    'description': data[2],
-                    'settlement_type_id': data[3],
-                    'is_main_group': data[4],
-                    'account_id': data[5]
-                }
+                'group_id': data[0],
+                'name': data[1],
+                'description': data[2],
+                'settlement_type_id': data[3],
+                'is_main_group': data[4],
+                'account_id': data[5]
+            }
         return result
 
     def get_default_payment_method(self, account_id):
@@ -358,10 +358,10 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'payment_method_id': data[0],
-                    'name': data[1],
-                    'account_id': data[2]
-                }
+                'payment_method_id': data[0],
+                'name': data[1],
+                'account_id': data[2]
+            }
         return result
 
     def get_user(self, user_id):
@@ -369,11 +369,11 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'user_id': data[0],
-                    'username': data[1],
-                    'main_group_id': data[2],
-                    'account_id': data[3]
-                }
+                'user_id': data[0],
+                'username': data[1],
+                'main_group_id': data[2],
+                'account_id': data[3]
+            }
         return result
 
     def get_category(self, category_id):
@@ -408,10 +408,10 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'payment_method_id': data[0],
-                    'name': data[1],
-                    'account_id': data[2]
-                }
+                'payment_method_id': data[0],
+                'name': data[1],
+                'account_id': data[2]
+            }
         return result
 
     def get_expense(self, expense_id):
@@ -419,21 +419,21 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'expense_id': data[0],
-                    'operation_date': data[1],
-                    'amount': data[2],
-                    'expense_name': data[3],
-                    'description': data[4],
-                    'username': data[5],
-                    'category_name': data[6],
-                    'payment_method_name': data[7],
-                    'group_name': data[8],
-                    'user_id': data[9],
-                    'category_id': data[10],
-                    'payment_method_id': data[11],
-                    'group_id': data[12],
-                    'settlement_type_id': data[13]
-                }
+                'expense_id': data[0],
+                'operation_date': data[1],
+                'amount': data[2],
+                'expense_name': data[3],
+                'description': data[4],
+                'username': data[5],
+                'category_name': data[6],
+                'payment_method_name': data[7],
+                'group_name': data[8],
+                'user_id': data[9],
+                'category_id': data[10],
+                'payment_method_id': data[11],
+                'group_id': data[12],
+                'settlement_type_id': data[13]
+            }
 
         return result
 
@@ -442,17 +442,17 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'income_id': data[0],
-                    'operation_date': data[1],
-                    'amount': data[2],
-                    'income_name': data[3],
-                    'description': data[4],
-                    'category_name': data[5],
-                    'group_name': data[6],
-                    'category_id': data[7],
-                    'group_id': data[8],
-                    'settlement_type_id': data[9]
-                }
+                'income_id': data[0],
+                'operation_date': data[1],
+                'amount': data[2],
+                'income_name': data[3],
+                'description': data[4],
+                'category_name': data[5],
+                'group_name': data[6],
+                'category_id': data[7],
+                'group_id': data[8],
+                'settlement_type_id': data[9]
+            }
         return result
 
     # ------------------------------------------ INSERT QUERIES ------------------------------------------------------ #
@@ -697,8 +697,10 @@ class DatabaseManager:
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def __update_payment_method(self, payment_method_id, name):
         sql = ('UPDATE payment_method_tbl '
@@ -742,7 +744,7 @@ class DatabaseManager:
                'username, '
                'mainGroupId, '
                'accountId '
-               ' FROM user_tbl ' 
+               ' FROM user_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -789,7 +791,7 @@ class DatabaseManager:
                'description, '
                'categoryTypeId, '
                'accountId '
-               'FROM category_tbl ' 
+               'FROM category_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -811,7 +813,7 @@ class DatabaseManager:
                'settlementTypeId, '
                'isMainGroup, '
                'accountId '
-               'FROM group_tbl ' 
+               'FROM group_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -830,7 +832,7 @@ class DatabaseManager:
                'paymentMethodId, '
                'name, '
                'accountId '
-               'FROM payment_method_tbl ' 
+               'FROM payment_method_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -848,7 +850,7 @@ class DatabaseManager:
         sql = ('SELECT '
                'name, '
                'description '
-               'FROM category_type_tbl ' 
+               'FROM category_type_tbl '
                f'ORDER BY {order_by}')
         try:
             self.connect_to_db()
@@ -865,7 +867,7 @@ class DatabaseManager:
                'settlementTypeId, '
                'name, '
                'description, '
-               'FROM settlement_type_tbl ' 
+               'FROM settlement_type_tbl '
                f'ORDER BY {order_by}')
         try:
             self.connect_to_db()
@@ -1188,7 +1190,7 @@ class DatabaseManager:
                'paymentMethodId, '
                'name, '
                'accountId '
-               'FROM payment_method_tbl ' 
+               'FROM payment_method_tbl '
                'WHERE '
                'paymentMethodId=%s ')
         try:

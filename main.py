@@ -1,6 +1,5 @@
 import re
 import datetime
-import math
 
 from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
@@ -32,6 +31,8 @@ class MyScreenManager(ScreenManager):
             destination_screen = 'expense_details_screen'
         elif self.current_screen.name == 'incomes_list_screen':
             destination_screen = 'income_details_screen'
+        elif self.current_screen.name == 'users_list_screen':
+            destination_screen = 'edit_user_screen'
         else:
             pass
         self.change_screen(destination_screen)
@@ -909,8 +910,6 @@ class EditExpenseScreen(Screen):
                                              self.ids.categories_btn.button_data['id'],
                                              self.ids.groups_btn.button_data['id'],
                                              self.ids.payment_methods_btn.button_data['id'])
-        print(app.root.account_id, name)
-        print(expense_id)
         return expense_id
 
     def clear_input_fields(self):
@@ -1188,6 +1187,75 @@ class EditIncomeScreen(Screen):
                 self.show_message('Błąd, skontaktuj się z administratorem.')
 
 
+class EditUserScreen(Screen):
+    user = ObjectProperty(None)
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def on_pre_enter(self, *args):
+        self.user = self.load_user(App.get_running_app().root.label_id)
+        self.populate_fields()
+
+    def populate_fields(self):
+        self.ids.name.text = self.user['username']
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name):
+        return self.validate_name(name)
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa użytkownika powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def load_user(self, user_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać użytkownika')
+        user = db_manager.get_expense(user_id)
+        print(user)
+        return user
+
+    def check_in_database(self, name):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        print('Próbuję dodać użytkownika')
+        user_id = db_manager.edit_user(self.user['user_id'], name)
+        return user_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def compare_changes(self, name):
+        print('Comparing changes in user:')
+        print(self.user)
+        has_changed = False
+        if self.user['username'] != name:
+            has_changed = True
+            print(self.user['username'], '!=', name)
+        return has_changed
+
+    def update_user(self, name_field):
+        name = name_field.text
+
+        if self.validate_input(name) and self.compare_changes(name):
+            user_id = self.check_in_database(name)
+            if user_id != {}:
+                print('user succesfully updated')
+                self.show_message(f'Zmiany dla użytkownika {name} zostały zapisane.')
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+
 class CreateIncomeScreen(Screen):
     group_id = NumericProperty(0)
     category_id = NumericProperty(0)
@@ -1202,7 +1270,6 @@ class CreateIncomeScreen(Screen):
         self.categories_dropdown.clear_widgets()
         self.add_groups_dropdown()
         self.add_categories_dropdown()
-
 
     def add_groups_dropdown(self):
         db_manager = App.get_running_app().db_manager
@@ -1535,6 +1602,25 @@ class IncomesListScreen(Screen):
         incomes_list = db_manager.get_all_incomes(app.root.account_id)
         print(incomes_list)
         return incomes_list
+
+
+class UsersListScreen(Screen): # Dokończyć - do edycji wchodzę tylko w 1 użytkownika
+    def on_pre_enter(self, *args):
+        box = self.ids.box
+        users_list = self.get_users_list()
+        for user in users_list:
+            box.add_widget(SelectableLabel(text=f"{user['username']}", label_id=user['user_id']))
+
+    def on_pre_leave(self, *args):
+        self.ids.box.clear_widgets()
+
+    def get_users_list(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        print('Próbuję pobrać listę użytkowników')
+        users_list = db_manager.get_all_users(app.root.account_id)
+        print(users_list)
+        return users_list
 
 
 class CreateGroupScreen(Screen):

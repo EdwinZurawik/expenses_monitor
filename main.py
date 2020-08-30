@@ -1079,7 +1079,7 @@ class EditIncomeScreen(Screen):
         if date == '':
             self.show_message('Data jest polem wymaganym.')
         elif date_match is None or date_match.group(1) != date:
-            self.show_message('Błędny format day. (DD.MM.RRRR')
+            self.show_message('Błędny format daty. (DD.MM.RRRR)')
         else:
             valid = True
         return valid
@@ -1921,7 +1921,7 @@ class CreateIncomeScreen(Screen):
         if date == '':
             self.show_message('Data jest polem wymaganym.')
         elif date_match is None or date_match.group(1) != date:
-            self.show_message('Błędny format day. (DD.MM.RRRR')
+            self.show_message('Błędny format daty. (DD.MM.RRRR)')
         else:
             valid = True
         return valid

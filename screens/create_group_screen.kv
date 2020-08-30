@@ -127,11 +127,21 @@
                         group: 'settlement_type'
                 BoxLayout:
                     orientation: 'horizontal'
+                    size_hint_y: 3
+                    canvas:
+                        Color:
+                            rgba: 0.2, 0.4, 0.3, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
                     BoxLayout:
                         padding: 10
                         spacing: 5
                         size_hint_x: 0.1
                         orientation: 'vertical'
+                        Widget:
+                            size_hint_y: None
+                            height: 20
                         Button:
                             size_hint_y: None
                             text: '+'
@@ -141,7 +151,7 @@
                             on_release: root.add_user_field()
                             canvas:
                                 Color:
-                                    rgba: 0.5, 0.5, 0.5, 0.5
+                                    rgba: 1, 0.4, 0.3, 0.5
                                 Rectangle:
                                     pos: self.pos
                                     size: self.size

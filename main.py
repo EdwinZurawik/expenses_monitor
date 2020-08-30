@@ -1399,6 +1399,7 @@ class EditGroupScreen(Screen):
         self.populate_fields()
 
     def populate_fields(self):
+        self.clear_input_fields()
         self.ids.name.text = self.group['name']
         self.ids.description.text = self.group['description']
         if self.group['settlement_type_id'] == 1:
@@ -1407,7 +1408,7 @@ class EditGroupScreen(Screen):
         else:
             self.ids.settlement_percent.state = 'normal'
             self.ids.settlement_value.state = 'down'
-        self.ids.box.clear_widgets()
+        # self.ids.box.clear_widgets()
         self.users_dropdowns = {}
         for user in self.users_in_group:
             self.add_user_field(user['username'], user['user_id'], str(round(user['amount'], 2)), str(user['priority']))
@@ -1662,6 +1663,26 @@ class EditGroupScreen(Screen):
         self.ids.settlement_value.state = 'normal'
         self.highest_id = 0
         self.ids.box.clear_widgets()
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Użytkownik'))
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Kwota/procent'))
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Priorytet'))
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Usuń'))
         self.users_dropdowns = {}
 
     def show_message(self, message):
@@ -2497,6 +2518,26 @@ class CreateGroupScreen(Screen):
         self.ids.settlement_value.state = 'normal'
         self.highest_id = 0
         self.ids.box.clear_widgets()
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Użytkownik'))
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Kwota/procent'))
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Priorytet'))
+        self.ids.box.add_widget(Label(size_hint_x=0.25,
+                                      size_hint_y=None,
+                                      height=20,
+                                      font_size=15,
+                                      text='Usuń'))
         self.users_dropdowns = {}
 
     def show_message(self, message):

@@ -1,5 +1,5 @@
-<CreateGroupScreen>:
-    name: 'create_group_screen'
+<EditGroupScreen>:
+    name: 'edit_group_screen'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -215,8 +215,8 @@
                         size_hint_y: None
                         size_hint_x: 0.5
                         height: 30
-                        text: 'Dodaj'
-                        on_release: root.add_group(root.ids.name, root.ids.description, root.ids.settlement_percent, root.ids.settlement_value)
+                        text: 'Zapisz zmiany'
+                        on_release: root.update_group(root.ids.name, root.ids.description, root.ids.settlement_percent, root.ids.settlement_value)
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5

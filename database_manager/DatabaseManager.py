@@ -91,13 +91,13 @@ class DatabaseManager:
         self.__update_account(account_id, password, email)
 
     def edit_user(self, user_id, username):
-        self.__update_user(user_id, username)
+        return self.__update_user(user_id, username)
 
-    def edit_group(self, group_id, name, description, settlement_type_id):
-        self.__update_group(group_id, name, description, settlement_type_id)
+    def edit_group(self, group_id, name, description, settlement_type_id, is_main_group=False):
+        return self.__update_group(group_id, name, description, settlement_type_id, is_main_group)
 
     def edit_category(self, category_id, name, description, category_type_id):
-        self.__update_category(category_id, name, description, category_type_id)
+        return self.__update_category(category_id, name, description, category_type_id)
 
     def edit_expense(self, expense_id, operation_date, name, description, amount,
                      payer_id, category_id, group_id, payment_method_id):
@@ -108,7 +108,10 @@ class DatabaseManager:
         return self.__update_income(income_id, operation_date, name, description, amount, category_id, group_id)
 
     def edit_payment_method(self, payment_method_id, name):
-        self.__update_payment_method(payment_method_id, name)
+        return self.__update_payment_method(payment_method_id, name)
+
+    def edit_user_from_group(self, user_id, group_id, amount, priority):
+        return self.__update_user_from_group(user_id, group_id, amount, priority)
 
     # ----------------------------------------------- GET ------------------------------------------------------------ #
 
@@ -455,6 +458,11 @@ class DatabaseManager:
             }
         return result
 
+    # ---------------------------------------------- REMOVE ---------------------------------------------------------- #
+
+    def remove_user_from_group(self, user_id, group_id):
+        return self.__delete_user_from_group(user_id, group_id)
+
     # ------------------------------------------ INSERT QUERIES ------------------------------------------------------ #
 
     def __insert_account(self, username, password, email):
@@ -619,24 +627,29 @@ class DatabaseManager:
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
-    def __update_group(self, group_id, name, description, settlement_type_id):
+    def __update_group(self, group_id, name, description, settlement_type_id, is_main_group=False):
         sql = ('UPDATE group_tbl '
                'SET '
                'name = %s, '
                'description = %s, '
-               'settlementTypeId = %s '
+               'settlementTypeId = %s, '
+               'isMainGroup = %s '
                'WHERE groupId = %s')
         try:
             self.connect_to_db()
-            self.cursor.execute(sql, (group_id, name, description, settlement_type_id))
+            self.cursor.execute(sql, (name, description, settlement_type_id, is_main_group, group_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def __update_category(self, category_id, name, description, category_type_id):
         sql = ('UPDATE category_tbl '
@@ -647,12 +660,14 @@ class DatabaseManager:
                'WHERE categoryId = %s')
         try:
             self.connect_to_db()
-            self.cursor.execute(sql, (category_id, name, description, category_type_id))
+            self.cursor.execute(sql, (name, description, category_type_id, category_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def __update_expense(self, expense_id, operation_date, name, description, amount,
                          payer_id, category_id, group_id, payment_method_id):
@@ -713,8 +728,29 @@ class DatabaseManager:
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
+
+    def __update_user_from_group(self, user_id, group_id, amount, priority):
+        print('Trying to update:', user_id, group_id, amount, priority)
+        sql = ('UPDATE user_group_tbl '
+               'SET '
+               'amount = %s, '
+               'priority = %s '
+               'WHERE userId = %s '
+               'AND groupId = %s')
+        try:
+            self.connect_to_db()
+            self.cursor.execute(sql, (amount, priority, user_id, group_id))
+            self.db.commit()
+        except mysql.connector.Error as err:
+            print(err.msg)
+            return err.msg
+        finally:
+            self.close_connection()
+        return None
 
     # -------------------------------------------- SELECT QUERIES ---------------------------------------------------- #
 
@@ -1283,16 +1319,18 @@ class DatabaseManager:
     def __delete_user_from_group(self, user_id, group_id):
         sql = ('DELETE FROM user_group_tbl '
                'WHERE '
-               'userId = %s, '
-               'groupId = %s')
+               'userId = %s '
+               'AND groupId = %s')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (user_id, group_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def delete_users_from_group(self):
         pass

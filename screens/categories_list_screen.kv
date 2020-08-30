@@ -1,0 +1,88 @@
+<CategoriesListScreen>:
+    name: 'categories_list_screen'
+    FloatLayout:
+        FloatLayout:
+            size_hint: None, None
+            size: root.width * 0.9, root.height * 0.9
+            center: self.parent.center
+            canvas:
+                Color:
+                    rgba: 0.5, 0.5, 0.5, 0.5
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            BoxLayout:
+                orientation: 'vertical'
+                pos: self.parent.pos
+                canvas:
+                    Color:
+                        rgba: 0, 1, 0.5, 0.5
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                ScrollView:
+                    GridLayout:
+                        spacing: 5
+                        cols: 1
+                        orientation: 'vertical'
+                        size_hint_y: None
+                        col_default_width: self.width
+                        row_default_height: 40
+                        height: self.minimum_height
+                        id: box
+                        canvas:
+                            Color:
+                                rgba: 0.58, 0.59, 1.00, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                FloatLayout:
+                    size_hint_y: 0.1
+                    canvas:
+                        Color:
+                            rgba: 0.2, 0.7, 0.2, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    BoxLayout:
+                        spacing: 10
+                        size_hint_y: None
+                        height: 30
+                        center_y: self.parent.center_y
+                        x: self.parent.x
+                        orientation: 'horizontal'
+                        canvas:
+                            Color:
+                                rgba: 0.7, 0.5, 1, 0.5
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                        Widget:
+                        Button:
+                            center_y: self.parent.center_y
+                            size_hint_y: None
+                            font_size: 20
+                            height: 30
+                            text: 'Powrót'
+                            on_release: app.root.current = 'menu_screen'
+                            canvas:
+                                Color:
+                                    rgba: 0.5, 0, 0, 0.5
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Button:
+                            center_y: self.parent.center_y
+                            size_hint_y: None
+                            font_size: 20
+                            height: 30
+                            text: 'Dodaj'
+                            on_release: app.root.current = 'create_category_screen'
+                            canvas:
+                                Color:
+                                    rgba: 0.5, 0, 0, 0.5
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Widget:
+

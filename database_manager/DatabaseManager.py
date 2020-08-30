@@ -91,22 +91,27 @@ class DatabaseManager:
         self.__update_account(account_id, password, email)
 
     def edit_user(self, user_id, username):
-        self.__update_user(user_id, username)
+        return self.__update_user(user_id, username)
 
-    def edit_group(self, group_id, name, description, settlement_type_id):
-        self.__update_group(group_id, name, description, settlement_type_id)
+    def edit_group(self, group_id, name, description, settlement_type_id, is_main_group=False):
+        return self.__update_group(group_id, name, description, settlement_type_id, is_main_group)
 
     def edit_category(self, category_id, name, description, category_type_id):
-        self.__update_category(category_id, name, description, category_type_id)
+        return self.__update_category(category_id, name, description, category_type_id)
 
-    def edit_expense(self, expense_id, operation_date, name, description, amount, payer_id, category_id, group_id):
-        self.__update_expense(expense_id, operation_date, name, description, amount, payer_id, category_id, group_id)
+    def edit_expense(self, expense_id, operation_date, name, description, amount,
+                     payer_id, category_id, group_id, payment_method_id):
+        return self.__update_expense(expense_id, operation_date, name, description, amount,
+                                     payer_id, category_id, group_id, payment_method_id)
 
     def edit_income(self, income_id, operation_date, name, description, amount, category_id, group_id):
-        self.__update_income(income_id, operation_date, name, description, amount, category_id, group_id)
+        return self.__update_income(income_id, operation_date, name, description, amount, category_id, group_id)
 
     def edit_payment_method(self, payment_method_id, name):
-        self.__update_payment_method(payment_method_id, name)
+        return self.__update_payment_method(payment_method_id, name)
+
+    def edit_user_from_group(self, user_id, group_id, amount, priority):
+        return self.__update_user_from_group(user_id, group_id, amount, priority)
 
     # ----------------------------------------------- GET ------------------------------------------------------------ #
 
@@ -316,12 +321,12 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'category_id': data[0],
-                    'name': data[1],
-                    'description': data[2],
-                    'category_type_id': data[3],
-                    'account_id': data[4]
-                }
+                'category_id': data[0],
+                'name': data[1],
+                'description': data[2],
+                'category_type_id': data[3],
+                'account_id': data[4]
+            }
         return result
 
     def get_default_income_category(self, account_id):
@@ -342,13 +347,13 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'group_id': data[0],
-                    'name': data[1],
-                    'description': data[2],
-                    'settlement_type_id': data[3],
-                    'is_main_group': data[4],
-                    'account_id': data[5]
-                }
+                'group_id': data[0],
+                'name': data[1],
+                'description': data[2],
+                'settlement_type_id': data[3],
+                'is_main_group': data[4],
+                'account_id': data[5]
+            }
         return result
 
     def get_default_payment_method(self, account_id):
@@ -356,10 +361,10 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'payment_method_id': data[0],
-                    'name': data[1],
-                    'account_id': data[2]
-                }
+                'payment_method_id': data[0],
+                'name': data[1],
+                'account_id': data[2]
+            }
         return result
 
     def get_user(self, user_id):
@@ -367,11 +372,11 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'user_id': data[0],
-                    'username': data[1],
-                    'main_group_id': data[2],
-                    'account_id': data[3]
-                }
+                'user_id': data[0],
+                'username': data[1],
+                'main_group_id': data[2],
+                'account_id': data[3]
+            }
         return result
 
     def get_category(self, category_id):
@@ -406,10 +411,10 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'payment_method_id': data[0],
-                    'name': data[1],
-                    'account_id': data[2]
-                }
+                'payment_method_id': data[0],
+                'name': data[1],
+                'account_id': data[2]
+            }
         return result
 
     def get_expense(self, expense_id):
@@ -417,21 +422,21 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'expense_id': data[0],
-                    'operation_date': data[1],
-                    'amount': data[2],
-                    'expense_name': data[3],
-                    'description': data[4],
-                    'username': data[5],
-                    'category_name': data[6],
-                    'payment_method_name': data[7],
-                    'group_name': data[8],
-                    'user_id': data[9],
-                    'category_id': data[10],
-                    'payment_method_id': data[11],
-                    'group_id': data[12],
-                    'settlement_type_id': data[13]
-                }
+                'expense_id': data[0],
+                'operation_date': data[1],
+                'amount': data[2],
+                'expense_name': data[3],
+                'description': data[4],
+                'username': data[5],
+                'category_name': data[6],
+                'payment_method_name': data[7],
+                'group_name': data[8],
+                'user_id': data[9],
+                'category_id': data[10],
+                'payment_method_id': data[11],
+                'group_id': data[12],
+                'settlement_type_id': data[13]
+            }
 
         return result
 
@@ -440,18 +445,23 @@ class DatabaseManager:
         result = {}
         if data is not None:
             result = {
-                    'income_id': data[0],
-                    'operation_date': data[1],
-                    'amount': data[2],
-                    'income_name': data[3],
-                    'description': data[4],
-                    'category_name': data[5],
-                    'group_name': data[6],
-                    'category_id': data[7],
-                    'group_id': data[8],
-                    'settlement_type_id': data[9]
-                }
+                'income_id': data[0],
+                'operation_date': data[1],
+                'amount': data[2],
+                'income_name': data[3],
+                'description': data[4],
+                'category_name': data[5],
+                'group_name': data[6],
+                'category_id': data[7],
+                'group_id': data[8],
+                'settlement_type_id': data[9]
+            }
         return result
+
+    # ---------------------------------------------- REMOVE ---------------------------------------------------------- #
+
+    def remove_user_from_group(self, user_id, group_id):
+        return self.__delete_user_from_group(user_id, group_id)
 
     # ------------------------------------------ INSERT QUERIES ------------------------------------------------------ #
 
@@ -617,24 +627,29 @@ class DatabaseManager:
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
-    def __update_group(self, group_id, name, description, settlement_type_id):
+    def __update_group(self, group_id, name, description, settlement_type_id, is_main_group=False):
         sql = ('UPDATE group_tbl '
                'SET '
                'name = %s, '
                'description = %s, '
-               'settlementTypeId = %s '
+               'settlementTypeId = %s, '
+               'isMainGroup = %s '
                'WHERE groupId = %s')
         try:
             self.connect_to_db()
-            self.cursor.execute(sql, (group_id, name, description, settlement_type_id))
+            self.cursor.execute(sql, (name, description, settlement_type_id, is_main_group, group_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def __update_category(self, category_id, name, description, category_type_id):
         sql = ('UPDATE category_tbl '
@@ -645,14 +660,17 @@ class DatabaseManager:
                'WHERE categoryId = %s')
         try:
             self.connect_to_db()
-            self.cursor.execute(sql, (category_id, name, description, category_type_id))
+            self.cursor.execute(sql, (name, description, category_type_id, category_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
-    def __update_expense(self, expense_id, operation_date, name, description, amount, payer_id, category_id, group_id):
+    def __update_expense(self, expense_id, operation_date, name, description, amount,
+                         payer_id, category_id, group_id, payment_method_id):
         sql = ('UPDATE expense_tbl '
                'SET '
                'operationDate = %s, '
@@ -661,17 +679,21 @@ class DatabaseManager:
                'amount = %s, '
                'payerId = %s, '
                'categoryId = %s, '
-               'groupId = %s '
+               'groupId = %s,'
+               'paymentMethodId = %s '
                'WHERE expenseId = %s')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (operation_date, name, description, amount,
-                                      payer_id, category_id, group_id, expense_id))
+                                      payer_id, category_id, group_id,
+                                      payment_method_id, expense_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def __update_income(self, income_id, operation_date, name, description, amount, category_id, group_id):
         sql = ('UPDATE income_tbl '
@@ -690,8 +712,10 @@ class DatabaseManager:
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def __update_payment_method(self, payment_method_id, name):
         sql = ('UPDATE payment_method_tbl '
@@ -704,8 +728,29 @@ class DatabaseManager:
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
+
+    def __update_user_from_group(self, user_id, group_id, amount, priority):
+        print('Trying to update:', user_id, group_id, amount, priority)
+        sql = ('UPDATE user_group_tbl '
+               'SET '
+               'amount = %s, '
+               'priority = %s '
+               'WHERE userId = %s '
+               'AND groupId = %s')
+        try:
+            self.connect_to_db()
+            self.cursor.execute(sql, (amount, priority, user_id, group_id))
+            self.db.commit()
+        except mysql.connector.Error as err:
+            print(err.msg)
+            return err.msg
+        finally:
+            self.close_connection()
+        return None
 
     # -------------------------------------------- SELECT QUERIES ---------------------------------------------------- #
 
@@ -735,7 +780,7 @@ class DatabaseManager:
                'username, '
                'mainGroupId, '
                'accountId '
-               ' FROM user_tbl ' 
+               ' FROM user_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -782,7 +827,7 @@ class DatabaseManager:
                'description, '
                'categoryTypeId, '
                'accountId '
-               'FROM category_tbl ' 
+               'FROM category_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -804,7 +849,7 @@ class DatabaseManager:
                'settlementTypeId, '
                'isMainGroup, '
                'accountId '
-               'FROM group_tbl ' 
+               'FROM group_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -823,7 +868,7 @@ class DatabaseManager:
                'paymentMethodId, '
                'name, '
                'accountId '
-               'FROM payment_method_tbl ' 
+               'FROM payment_method_tbl '
                'WHERE '
                'accountId=%s '
                f'ORDER BY {order_by}')
@@ -841,7 +886,7 @@ class DatabaseManager:
         sql = ('SELECT '
                'name, '
                'description '
-               'FROM category_type_tbl ' 
+               'FROM category_type_tbl '
                f'ORDER BY {order_by}')
         try:
             self.connect_to_db()
@@ -858,7 +903,7 @@ class DatabaseManager:
                'settlementTypeId, '
                'name, '
                'description, '
-               'FROM settlement_type_tbl ' 
+               'FROM settlement_type_tbl '
                f'ORDER BY {order_by}')
         try:
             self.connect_to_db()
@@ -1181,7 +1226,7 @@ class DatabaseManager:
                'paymentMethodId, '
                'name, '
                'accountId '
-               'FROM payment_method_tbl ' 
+               'FROM payment_method_tbl '
                'WHERE '
                'paymentMethodId=%s ')
         try:
@@ -1274,16 +1319,18 @@ class DatabaseManager:
     def __delete_user_from_group(self, user_id, group_id):
         sql = ('DELETE FROM user_group_tbl '
                'WHERE '
-               'userId = %s, '
-               'groupId = %s')
+               'userId = %s '
+               'AND groupId = %s')
         try:
             self.connect_to_db()
             self.cursor.execute(sql, (user_id, group_id))
             self.db.commit()
         except mysql.connector.Error as err:
             print(err.msg)
+            return err.msg
         finally:
             self.close_connection()
+        return None
 
     def delete_users_from_group(self):
         pass

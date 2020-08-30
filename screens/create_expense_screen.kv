@@ -152,7 +152,6 @@
                     ButtonWithData:
                         id: payers_btn
                         text: 'Wybierz'
-                        #on_release: root.add_payers_dropdown()
                 BoxLayout:
                     size_hint_y: None
                     height: 40
@@ -178,7 +177,6 @@
                     ButtonWithData:
                         id: groups_btn
                         text: 'Wybierz'
-                        #on_release: root.add_groups_dropdown()
                         Widget:
                 BoxLayout:
                     size_hint_y: None
@@ -205,7 +203,6 @@
                     ButtonWithData:
                         id: categories_btn
                         text: 'Wybierz'
-                        #on_release: root.add_categories_dropdown()
                 BoxLayout:
                     size_hint_y: None
                     height: 40
@@ -278,7 +275,6 @@
                     ButtonWithData:
                         id: payment_methods_btn
                         text: 'Wybierz'
-                        #on_release: root.add_payment_methods_dropdown()
                 BoxLayout:
                     size_hint_y: None
                     height: 50
@@ -329,14 +325,3 @@
                         Rectangle:
                             pos: self.pos
                             size: self.size
-
-<CustomDropdown>:
-    DropDown:
-        id: payers
-        canvas:
-            Color:
-                rgba: 1, 0, 0, 0.5
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        on_select: mainbtn.text = f'{args[1]}'

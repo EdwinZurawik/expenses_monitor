@@ -7,11 +7,11 @@ class BalanceReport:
     def get_data_from_db(self, account_id, report_group_id, date_from, date_to):
         operations_list = self.manager.get_all_expenses_between_dates(account_id, date_from, date_to)
         operations_list.extend(self.manager.get_all_incomes_between_dates(account_id, date_from, date_to))
-        report_group = self.manager.get_all_users_from_group(report_group_id)
+        report_group = self.manager.get_all_users_from_group(report_group_id, order_by='priority')
         report_data = {'report_group': report_group, 'operations': []}
 
         for operation in operations_list:
-            group = self.manager.get_all_users_from_group(operation['group_id'])
+            group = self.manager.get_all_users_from_group(operation['group_id'], order_by='priority')
             category_type_id = self.manager.get_category(operation['category_id'])['category_type_id']
 
             report_data['operations'].append(
@@ -75,7 +75,6 @@ class BalanceReport:
 
     def calculate_by_amount(self, user_id, group, amount):
         balance = 0
-
         for i, member in enumerate(group):
             member_id = member['user_id']
             member_amount = member['amount']

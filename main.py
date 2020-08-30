@@ -31,6 +31,14 @@ class MyScreenManager(ScreenManager):
             destination_screen = 'expense_details_screen'
         elif self.current_screen.name == 'incomes_list_screen':
             destination_screen = 'income_details_screen'
+        elif self.current_screen.name == 'users_list_screen':
+            destination_screen = 'edit_user_screen'
+        elif self.current_screen.name == 'payment_methods_list_screen':
+            destination_screen = 'edit_payment_method_screen'
+        elif self.current_screen.name == 'categories_list_screen':
+            destination_screen = 'edit_category_screen'
+        elif self.current_screen.name == 'groups_list_screen':
+            destination_screen = 'edit_group_screen'
         else:
             pass
         self.change_screen(destination_screen)
@@ -109,7 +117,7 @@ class BalanceReportScreen(Screen):
         if date == '':
             self.show_message('Data jest polem wymaganym.')
         elif date_match is None or date_match.group(1) != date:
-            self.show_message('Błędny format day. (DD.MM.RRRR')
+            self.show_message('Błędny format daty. (DD.MM.RRRR)')
         else:
             valid = True
         return valid
@@ -146,13 +154,16 @@ class BalanceReportScreen(Screen):
             date_to = datetime.datetime.strptime(date_to, '%d.%m.%Y')
 
             report_data = self.generate_balance_report(date_from, date_to)
+            balance = report_data["summary"]["incomes"] - report_data["summary"]["expenses"]
 
             for item in report_data['expenses']:
                 box.add_widget(Label(text=item, halign='left'))
             for item in report_data['incomes']:
                 box.add_widget(Label(text=item, halign='left'))
-            self.ids.summary.text = f'Suma wydatków: {report_data["summary"]["expenses"]} zł ' \
-                                    f'/ Suma przychodów: {report_data["summary"]["incomes"]} zł.'
+
+            self.ids.summary.text = f'Wydatki: {report_data["summary"]["expenses"]} zł ' \
+                                    f'| Przychody: {report_data["summary"]["incomes"]} zł ' \
+                                    f'| Bilans: {balance} zł.'
             self.show_message('')
 
     def generate_balance_report(self, date_from, date_to):
@@ -241,7 +252,7 @@ class SettlementReportScreen(Screen):
         if date == '':
             self.show_message('Data jest polem wymaganym.')
         elif date_match is None or date_match.group(1) != date:
-            self.show_message('Błędny format day. (DD.MM.RRRR')
+            self.show_message('Błędny format daty. (DD.MM.RRRR)')
         else:
             valid = True
         return valid
@@ -356,7 +367,7 @@ class PaymentMethodReportScreen(Screen):
         if date == '':
             self.show_message('Data jest polem wymaganym.')
         elif date_match is None or date_match.group(1) != date:
-            self.show_message('Błędny format day. (DD.MM.RRRR')
+            self.show_message('Błędny format daty. (DD.MM.RRRR)')
         else:
             valid = True
         return valid
@@ -450,6 +461,10 @@ class CreateExpenseScreen(Screen):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
+        self.payers_dropdown.clear_widgets()
+        self.groups_dropdown.clear_widgets()
+        self.categories_dropdown.clear_widgets()
+        self.payment_methods_dropdown.clear_widgets()
         self.add_payers_dropdown()
         self.add_groups_dropdown()
         self.add_categories_dropdown()
@@ -565,7 +580,7 @@ class CreateExpenseScreen(Screen):
         if date == '':
             self.show_message('Data jest polem wymaganym.')
         elif date_match is None or date_match.group(1) != date:
-            self.show_message('Błędny format day. (DD.MM.RRRR')
+            self.show_message('Błędny format daty. (DD.MM.RRRR)')
         else:
             valid = True
         return valid
@@ -652,10 +667,6 @@ class CreateExpenseScreen(Screen):
         self.ids.groups_btn.button_data = {'text': 'Wybierz', 'id': 0}
         self.ids.categories_btn.button_data = {'text': 'Wybierz', 'id': 0}
         self.ids.payment_methods_btn.button_data = {'text': 'Wybierz', 'id': 0}
-        self.payers_dropdown.clear_widgets()
-        self.groups_dropdown.clear_widgets()
-        self.categories_dropdown.clear_widgets()
-        self.payment_methods_dropdown.clear_widgets()
 
     def show_message(self, message):
         self.ids.message.text = message
@@ -676,6 +687,1157 @@ class CreateExpenseScreen(Screen):
                 self.show_message('Błąd, skontaktuj się z administratorem.')
 
 
+class EditExpenseScreen(Screen):
+    expense = ObjectProperty(None)
+    payer_id = NumericProperty(0)
+    group_id = NumericProperty(0)
+    category_id = NumericProperty(0)
+    payment_method_id = NumericProperty(0)
+    payers_dropdown = DropDown()
+    groups_dropdown = DropDown()
+    categories_dropdown = DropDown()
+    payment_methods_dropdown = DropDown()
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def populate_fields(self):
+        self.payer_id = self.expense['user_id']
+        self.group_id = self.expense['group_id']
+        self.category_id = self.expense['category_id']
+        self.payment_method_id = self.expense['payment_method_id']
+        self.ids.payers_btn.button_data = {'text': self.expense['username'], 'id': self.expense['user_id']}
+        self.ids.groups_btn.button_data = {'text': self.expense['group_name'], 'id': self.expense['group_id']}
+        self.ids.categories_btn.button_data = {'text': self.expense['category_name'], 'id': self.expense['category_id']}
+        self.ids.payment_methods_btn.button_data = {'text': self.expense['payment_method_name'],
+                                                    'id': self.expense['payment_method_id']}
+        self.ids.name.text = self.expense['expense_name']
+        self.ids.date.text = self.expense['operation_date'].strftime('%d.%m.%Y')
+        self.ids.description.text = self.expense['description']
+        self.ids.amount.text = str(round(self.expense['amount'], 2))
+
+    def on_pre_enter(self, *args):
+        self.expense = self.load_expense(App.get_running_app().root.label_id)
+        self.add_payers_dropdown()
+        self.add_groups_dropdown()
+        self.add_categories_dropdown()
+        self.add_payment_methods_dropdown()
+        self.populate_fields()
+
+    def add_payers_dropdown(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        users_list = db_manager.get_all_users(app.root.account_id)
+
+        for user in users_list:
+            btn = ButtonWithData(text=user['username'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': user['username'], 'id': user['user_id']})
+            btn.bind(on_release=lambda btn: self.payers_dropdown.select(btn.button_data))
+            self.payers_dropdown.add_widget(btn)
+        payers_btn = self.ids.payers_btn
+        payers_btn.bind(on_release=self.payers_dropdown.open)
+        self.payers_dropdown.bind(on_select=lambda instance, x: setattr(payers_btn, 'button_data', x))
+
+    def add_groups_dropdown(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        groups_list = db_manager.get_all_groups(app.root.account_id)
+
+        for group in groups_list:
+            btn = ButtonWithData(text=group['name'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': group['name'], 'id': group['group_id']})
+            btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
+            self.groups_dropdown.add_widget(btn)
+        groups_btn = self.ids.groups_btn
+        groups_btn.bind(on_release=self.groups_dropdown.open)
+        self.groups_dropdown.bind(on_select=lambda instance, x: setattr(groups_btn, 'button_data', x))
+
+    def add_categories_dropdown(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        categories_list = db_manager.get_all_categories(app.root.account_id)
+
+        for category in categories_list:
+            if category['category_type_id'] == 1:
+                btn = ButtonWithData(text=category['name'],
+                                     size_hint_y=None,
+                                     height='30',
+                                     button_data={'text': category['name'], 'id': category['category_id']})
+                btn.bind(on_release=lambda btn: self.categories_dropdown.select(btn.button_data))
+                self.categories_dropdown.add_widget(btn)
+        categories_btn = self.ids.categories_btn
+        categories_btn.bind(on_release=self.categories_dropdown.open)
+        self.categories_dropdown.bind(on_select=lambda instance, x: setattr(categories_btn, 'button_data', x))
+
+    def add_payment_methods_dropdown(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        payment_methods_list = db_manager.get_all_payment_methods(app.root.account_id)
+
+        for payment_method in payment_methods_list:
+            btn = ButtonWithData(text=payment_method['name'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': payment_method['name'],
+                                              'id': payment_method['payment_method_id']})
+            btn.bind(on_release=lambda btn: self.payment_methods_dropdown.select(btn.button_data))
+            self.payment_methods_dropdown.add_widget(btn)
+        payment_methods_btn = self.ids.payment_methods_btn
+        payment_methods_btn.bind(on_release=self.payment_methods_dropdown.open)
+        self.payment_methods_dropdown.bind(on_select=lambda instance, x: setattr(payment_methods_btn, 'button_data', x))
+
+    def set_payer_id(self):
+        self.payer_id = self.ids.payers_btn.button_data['id']
+
+    def set_group_id(self):
+        self.group_id = self.ids.groups_btn.button_data['id']
+
+    def set_category_id(self):
+        self.category_id = self.ids.categories_btn.button_data['id']
+
+    def set_payment_method_id(self):
+        self.payment_method_id = self.ids.payment_methods_btn.button_data['id']
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name, date, description, amount):
+        return self.validate_name(name) \
+               and self.validate_date(date) \
+               and self.validate_description(description) \
+               and self.validate_payer_id() \
+               and self.validate_group_id() \
+               and self.validate_category_id() \
+               and self.validate_amount(amount) \
+               and self.validate_payment_method_id()
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa wydatku powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_date(self, date):
+        valid = False
+        date_regex = re.compile(r'([0-9]{2}\.[0-9]{2}\.[0-9]{4})')
+        date_match = re.search(date_regex, date)
+        if date == '':
+            self.show_message('Data jest polem wymaganym.')
+        elif date_match is None or date_match.group(1) != date:
+            self.show_message('Błędny format daty. (DD.MM.RRRR)')
+        else:
+            valid = True
+        return valid
+
+    def validate_description(self, description):
+        valid = False
+        if len(description) > 255:
+            self.show_message('Maksymalna długość opisu to 255 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_payer_id(self):
+        valid = False
+        print(self.payer_id)
+        print(self.ids.payers_btn.button_data)
+        print(self.ids.payers_btn.button_data['id'])
+        self.set_payer_id()
+        if self.payer_id == 0:
+            self.show_message('Wybór osoby płacącej jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_group_id(self):
+        valid = False
+        self.set_group_id()
+        if self.group_id == 0:
+            self.show_message('Wybór grupy jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_category_id(self):
+        valid = False
+        self.set_category_id()
+        if self.category_id == 0:
+            self.show_message('Wybór kategorii jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_payment_method_id(self):
+        valid = False
+        self.set_payment_method_id()
+        if self.payment_method_id == 0:
+            self.show_message('Wybór metody płatniczej jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_amount(self, amount):
+        valid = False
+        amount_regex = re.compile(r'([0-9]+\.?[0-9]{0,2})')
+        amount_match = re.search(amount_regex, amount)
+        if amount == '':
+            self.show_message('Kwota jest polem wymaganym.')
+        elif amount_match is None or amount_match.group(1) != amount:
+            self.show_message('Błędna kwota.')
+        else:
+            valid = True
+        return valid
+
+    def load_expense(self, expense_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać wydatek')
+        expense = db_manager.get_expense(expense_id)
+        print(expense)
+        return expense
+
+    def check_in_database(self, name, date, description, amount):
+        db_manager = App.get_running_app().db_manager
+        date = datetime.datetime.strptime(date, '%d.%m.%Y')
+        formatted_date = date.strftime('%Y-%m-%d %H:%M:%S')
+        app = App.get_running_app()
+        print('Próbuję edytować wydatek')
+        expense_id = db_manager.edit_expense(self.expense['expense_id'], formatted_date, name, description,
+                                             amount, self.ids.payers_btn.button_data['id'],
+                                             self.ids.categories_btn.button_data['id'],
+                                             self.ids.groups_btn.button_data['id'],
+                                             self.ids.payment_methods_btn.button_data['id'])
+        return expense_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+        self.ids.date.text = ''
+        self.ids.description.text = ''
+        self.ids.amount.text = ''
+        self.ids.payers_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.groups_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.categories_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.payment_methods_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.payers_dropdown.clear_widgets()
+        self.groups_dropdown.clear_widgets()
+        self.categories_dropdown.clear_widgets()
+        self.payment_methods_dropdown.clear_widgets()
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def compare_changes(self, name, date, description, amount):
+        self.clear_message()
+        print('Comparing changes in expense:')
+        print(self.expense)
+        has_changed = False
+        if self.expense['operation_date'] != datetime.datetime.strptime(date, '%d.%m.%Y'):
+            has_changed = True
+            print(self.expense['operation_date'], '!=', datetime.datetime.strptime(date, '%d.%m.%Y'))
+        elif self.expense['expense_name'] != name:
+            has_changed = True
+            print(self.expense['expense_name'], '!=', name)
+        elif self.expense['description'] != description:
+            has_changed = True
+            print(self.expense['description'], '!=', description)
+        elif float(self.expense['amount']) != float(amount):
+            has_changed = True
+            print(self.expense['amount'], '!=', amount)
+        elif self.expense['user_id'] != self.ids.payers_btn.button_data['id']:
+            has_changed = True
+            print(self.expense['user_id'], '!=', self.ids.payers_btn.button_data['id'])
+        elif self.expense['group_id'] != self.ids.groups_btn.button_data['id']:
+            has_changed = True
+            print(self.expense['group_id'], '!=', self.ids.groups_btn.button_data['id'])
+        elif self.expense['category_id'] != self.ids.categories_btn.button_data['id']:
+            has_changed = True
+            print(self.expense['category_id'], '!=', self.ids.categories_btn.button_data['id'])
+        elif self.expense['payment_method_id'] != self.ids.payment_methods_btn.button_data['id']:
+            has_changed = True
+            print(self.expense['payment_method_id'], '!=', self.ids.payment_methods_btn.button_data['id'])
+        return has_changed
+
+    def update_expense(self, name_field, date_field, description_field, amount_field):
+        name = name_field.text
+        date = date_field.text
+        description = description_field.text
+        amount = amount_field.text
+
+        if self.validate_input(name, date, description, amount) \
+                and self.compare_changes(name, date, description, amount):
+
+            errors = self.check_in_database(name, date, description, amount)
+            if errors is None:
+                print('expense succesfully updated')
+                self.show_message(f'Zmiany w {name} zostały zapisane.')
+                self.expense = self.load_expense(self.expense['expense_id'])
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+
+class EditIncomeScreen(Screen):
+    income = ObjectProperty(None)
+    group_id = NumericProperty(0)
+    category_id = NumericProperty(0)
+    groups_dropdown = DropDown()
+    categories_dropdown = DropDown()
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def on_pre_enter(self, *args):
+        self.income = self.load_income(App.get_running_app().root.label_id)
+        self.add_groups_dropdown()
+        self.add_categories_dropdown()
+        self.populate_fields()
+
+    def populate_fields(self):
+        self.group_id = self.income['group_id']
+        self.category_id = self.income['category_id']
+        self.ids.groups_btn.button_data = {'text': self.income['group_name'], 'id': self.income['group_id']}
+        self.ids.categories_btn.button_data = {'text': self.income['category_name'], 'id': self.income['category_id']}
+        self.ids.name.text = self.income['income_name']
+        self.ids.date.text = self.income['operation_date'].strftime('%d.%m.%Y')
+        self.ids.description.text = self.income['description']
+        self.ids.amount.text = str(round(self.income['amount'], 2))
+
+    def add_groups_dropdown(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        groups_list = db_manager.get_all_groups(app.root.account_id)
+
+        for group in groups_list:
+            if group['is_main_group']:
+                btn = ButtonWithData(text=group['name'],
+                                     size_hint_y=None,
+                                     height='30',
+                                     button_data={'text': group['name'], 'id': group['group_id']})
+                btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
+                self.groups_dropdown.add_widget(btn)
+        groups_btn = self.ids.groups_btn
+        groups_btn.bind(on_release=self.groups_dropdown.open)
+        self.groups_dropdown.bind(on_select=lambda instance, x: setattr(groups_btn, 'button_data', x))
+
+    def add_categories_dropdown(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+
+        categories_list = db_manager.get_all_categories(app.root.account_id)
+
+        for category in categories_list:
+            if category['category_type_id'] == 2:
+                btn = ButtonWithData(text=category['name'],
+                                     size_hint_y=None,
+                                     height='30',
+                                     button_data={'text': category['name'], 'id': category['category_id']})
+                btn.bind(on_release=lambda btn: self.categories_dropdown.select(btn.button_data))
+                self.categories_dropdown.add_widget(btn)
+        categories_btn = self.ids.categories_btn
+        categories_btn.bind(on_release=self.categories_dropdown.open)
+        self.categories_dropdown.bind(on_select=lambda instance, x: setattr(categories_btn, 'button_data', x))
+
+    def set_group_id(self):
+        self.group_id = self.ids.groups_btn.button_data['id']
+
+    def set_category_id(self):
+        self.category_id = self.ids.categories_btn.button_data['id']
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name, date, description, amount):
+        return self.validate_name(name) \
+               and self.validate_date(date) \
+               and self.validate_description(description) \
+               and self.validate_group_id() \
+               and self.validate_category_id() \
+               and self.validate_amount(amount)
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa przychodu powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_date(self, date):
+        valid = False
+        date_regex = re.compile(r'([0-9]{2}\.[0-9]{2}\.[0-9]{4})')
+        date_match = re.search(date_regex, date)
+        if date == '':
+            self.show_message('Data jest polem wymaganym.')
+        elif date_match is None or date_match.group(1) != date:
+            self.show_message('Błędny format day. (DD.MM.RRRR')
+        else:
+            valid = True
+        return valid
+
+    def validate_description(self, description):
+        valid = False
+        if len(description) > 255:
+            self.show_message('Maksymalna długość opisu to 255 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_group_id(self):
+        valid = False
+        self.set_group_id()
+        if self.group_id == 0:
+            self.show_message('Wybór osoby, która otrzymała środki jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_category_id(self):
+        valid = False
+        self.set_category_id()
+        if self.category_id == 0:
+            self.show_message('Wybór kategorii jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
+    def validate_amount(self, amount):
+        valid = False
+        amount_regex = re.compile(r'([0-9]+\.?[0-9]{0,2})')
+        amount_match = re.search(amount_regex, amount)
+        if amount == '':
+            self.show_message('Kwota jest polem wymaganym.')
+        elif amount_match is None or amount_match.group(1) != amount:
+            self.show_message('Błędna kwota.')
+        else:
+            valid = True
+        return valid
+
+    def load_income(self, income_id):
+        db_manager = App.get_running_app().db_manager
+        print(f'Próbuję wczytać przychód {income_id}')
+        income = db_manager.get_income(income_id)
+        print(income)
+        return income
+
+    def check_in_database(self, name, date, description, amount):
+        db_manager = App.get_running_app().db_manager
+        date = datetime.datetime.strptime(date, '%d.%m.%Y')
+        formatted_date = date.strftime('%Y-%m-%d %H:%M:%S')
+        app = App.get_running_app()
+        print('Próbuję edytować wpływ')
+        income_id = db_manager.edit_income(self.income['income_id'], formatted_date, name, description,
+                                           amount, self.ids.categories_btn.button_data['id'],
+                                           self.ids.groups_btn.button_data['id'])
+        print(app.root.account_id, name)
+        print(income_id)
+        return income_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+        self.ids.date.text = ''
+        self.ids.description.text = ''
+        self.ids.amount.text = ''
+        self.ids.groups_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.categories_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.groups_dropdown.clear_widgets()
+        self.categories_dropdown.clear_widgets()
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def compare_changes(self, name, date, description, amount):
+        self.clear_message()
+        print('Comparing changes in income:')
+        print(self.income)
+        has_changed = False
+        if self.income['operation_date'] != datetime.datetime.strptime(date, '%d.%m.%Y'):
+            has_changed = True
+            print(self.income['operation_date'], '!=', datetime.datetime.strptime(date, '%d.%m.%Y'))
+        elif self.income['income_name'] != name:
+            has_changed = True
+            print(self.income['income_name'], '!=', name)
+        elif self.income['description'] != description:
+            has_changed = True
+            print(self.income['description'], '!=', description)
+        elif float(self.income['amount']) != float(amount):
+            has_changed = True
+            print(self.income['amount'], '!=', amount)
+        elif self.income['group_id'] != self.ids.groups_btn.button_data['id']:
+            has_changed = True
+            print(self.income['group_id'], '!=', self.ids.groups_btn.button_data['id'])
+        elif self.income['category_id'] != self.ids.categories_btn.button_data['id']:
+            has_changed = True
+            print(self.income['category_id'], '!=', self.ids.categories_btn.button_data['id'])
+        return has_changed
+
+    def update_income(self, name_field, date_field, description_field, amount_field):
+        name = name_field.text
+        date = date_field.text
+        description = description_field.text
+        amount = amount_field.text
+
+        if self.validate_input(name, date, description, amount) \
+                and self.compare_changes(name, date, description, amount):
+            errors = self.check_in_database(name, date, description, amount)
+            if errors is None:
+                print('income succesfully updated')
+                self.show_message(f'Zmiany w {name} zostały zapisane.')
+                self.income = self.load_income(self.income['income_id'])
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+
+class EditUserScreen(Screen):
+    user = ObjectProperty(None)
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def on_pre_enter(self, *args):
+        self.user = self.load_user(App.get_running_app().root.label_id)
+        self.populate_fields()
+
+    def populate_fields(self):
+        self.ids.name.text = self.user['username']
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name):
+        return self.validate_name(name)
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa użytkownika powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def load_user(self, user_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać użytkownika')
+        user = db_manager.get_user(user_id)
+        print(user)
+        return user
+
+    def check_in_database(self, name):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję dodać użytkownika')
+        user_id = db_manager.edit_user(self.user['user_id'], name)
+        return user_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def compare_changes(self, name):
+        self.clear_message()
+        print('Comparing changes in user:')
+        print(self.user)
+        has_changed = False
+        if self.user['username'] != name:
+            has_changed = True
+            print(self.user['username'], '!=', name)
+        return has_changed
+
+    def update_user(self, name_field):
+        name = name_field.text
+
+        if self.validate_input(name) and self.compare_changes(name):
+            errors = self.check_in_database(name)
+            if errors is None:
+                print('user succesfully updated')
+                self.show_message(f'Zmiany dla użytkownika {name} zostały zapisane.')
+                self.user = self.load_user(self.user['user_id'])
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+
+class EditCategoryScreen(Screen):
+    category = ObjectProperty(None)
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def on_pre_enter(self, *args):
+        self.category = self.load_category(App.get_running_app().root.label_id)
+        self.populate_fields()
+
+    def populate_fields(self):
+        self.ids.name.text = self.category['name']
+        self.ids.description.text = self.category['description']
+        if self.category['category_type_id'] == 1:
+            self.ids.expense_category.state = 'down'
+            self.ids.income_category.state = 'normal'
+        else:
+            self.ids.expense_category.state = 'normal'
+            self.ids.income_category.state = 'down'
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name, description, expense_category, income_category):
+        return self.validate_name(name) \
+               and self.validate_description(description) \
+               and self.validate_type(expense_category, income_category)
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa kategorii powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_description(self, description):
+        valid = False
+        if len(description) > 255:
+            self.show_message('Opis nie powinien przekroczyć 255 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_type(self, expense_category, income_category):
+        valid = False
+        if expense_category.state == 'normal' and income_category.state == 'normal':
+            self.show_message('Wybierz typ kategorii.')
+        elif expense_category.state == 'down' and income_category.state == 'down':
+            self.show_message('Można wybrać tylko jeden typ kategorii.')
+        else:
+            valid = True
+        return valid
+
+    def load_category(self, category_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać kategorię')
+        category = db_manager.get_category(category_id)
+        print(category)
+        return category
+
+    def check_in_database(self, name, description, expense_category):
+        db_manager = App.get_running_app().db_manager
+        category_type_id = 1 if expense_category.state == 'down' else 2
+        print('Próbuję dodać kategorię')
+        print(self.category['category_id'], name, description, category_type_id)
+        category_id = db_manager.edit_category(self.category['category_id'], name, description, category_type_id)
+        return category_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+        self.ids.description.text = ''
+        self.ids.expense_category.state = 'down'
+        self.ids.income_category.state = 'normal'
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def compare_changes(self, name, description, expense_category, income_category):
+        self.clear_message()
+        print('Comparing changes in category:')
+        print(self.category)
+        has_changed = False
+        if self.category['name'] != name:
+            has_changed = True
+            print(self.category['name'], '!=', name)
+        elif self.category['description'] != description:
+            has_changed = True
+            print(self.category['description'], '!=', description)
+        elif self.category['category_type_id'] == 1 \
+                and (expense_category.state == 'normal' or income_category.state == 'down'):
+            has_changed = True
+            print('category_type_id has changed')
+        elif self.category['category_type_id'] == 2 \
+                and (expense_category.state == 'down' or income_category.state == 'normal'):
+            has_changed = True
+            print('category_type_id has changed')
+        return has_changed
+
+    def update_category(self, name_field, description_field, expense_category, income_category):
+        name = name_field.text
+        description = description_field.text
+
+        if self.validate_input(name, description, expense_category, income_category) \
+                and self.compare_changes(name, description, expense_category, income_category):
+            errors = self.check_in_database(name, description, expense_category)
+            if errors is None:
+                print('category succesfully updated')
+                self.show_message(f'Zmiany dla kategorii {name} zostały zapisane.')
+                self.category = self.load_category(self.category['category_id'])
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+
+class EditGroupScreen(Screen):
+    group = ObjectProperty(None)
+    users_in_group = ObjectProperty(None)
+    users_dropdowns = DictProperty({})
+    highest_id = 0
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def on_pre_enter(self, *args):
+        group_id = App.get_running_app().root.label_id
+        self.group = self.load_group(group_id)
+        self.users_in_group = self.load_users_from_group(group_id)
+        self.populate_fields()
+
+    def populate_fields(self):
+        self.ids.name.text = self.group['name']
+        self.ids.description.text = self.group['description']
+        if self.group['settlement_type_id'] == 1:
+            self.ids.settlement_percent.state = 'down'
+            self.ids.settlement_value.state = 'normal'
+        else:
+            self.ids.settlement_percent.state = 'normal'
+            self.ids.settlement_value.state = 'down'
+        self.ids.box.clear_widgets()
+        self.users_dropdowns = {}
+        for user in self.users_in_group:
+            self.add_user_field(user['username'], user['user_id'], str(round(user['amount'], 2)), str(user['priority']))
+
+    def add_user_field(self, b_text='Wybierz', b_id=0, amount='', priority=''):
+        self.highest_id += 1
+        deletebtn = ButtonWithData(text='-', size_hint_x=0.25, id=f'delete{self.highest_id}')
+        userbtn = ButtonWithData(button_data={'text': b_text, 'id': b_id},
+                                 size_hint_x=0.35, id=f'user{self.highest_id}')
+        widgets = [userbtn,
+                   FloatInput(text=amount, font_size=18, size_hint_x=0.30, id=f'amount{self.highest_id}'),
+                   IntegerInput(text=priority, font_size=18, size_hint_x=0.10, id=f'priority{self.highest_id}'),
+                   deletebtn]
+        deletebtn.bind(on_release=lambda btn: self.remove_user_field(btn.id))
+
+        for widget in widgets:
+            self.ids.box.add_widget(widget)
+
+        new_dropdown = DropDown()
+        self.users_dropdowns[f'{self.highest_id}'] = new_dropdown
+        self.populate_users_dropdown(str(self.highest_id))
+        userbtn.bind(on_release=self.users_dropdowns[str(self.highest_id)].open)
+        self.users_dropdowns[str(self.highest_id)].bind(
+            on_select=lambda instance, x: setattr(userbtn, 'button_data', x))
+
+    def remove_user_field(self, id):
+        id_regex = re.compile(r'([0-9]+)')
+        id_match = re.search(id_regex, id)
+
+        names = ['user', 'amount', 'priority', 'delete']
+
+        for i in range(len(names)):
+            names[i] = names[i] + str(id_match.group(1))
+        box = self.ids.box
+
+        for child in box.children[:]:
+            if child.id in names:
+                box.remove_widget(child)
+
+        self.users_dropdowns.pop(str(id_match.group(1)))
+
+    def populate_users_dropdown(self, id):
+
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        self.users_dropdowns[id].clear_widgets()
+        users_list = db_manager.get_all_users(app.root.account_id)
+
+        for user in users_list:
+            btn = ButtonWithData(text=user['username'],
+                                 size_hint_y=None,
+                                 height='30',
+                                 button_data={'text': user['username'], 'id': user['user_id']})
+            btn.bind(on_release=lambda btn: self.users_dropdowns[id].select(btn.button_data))
+            self.users_dropdowns[id].add_widget(btn)
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name, description, settlement_percent, settlement_value):
+        return self.validate_name(name) \
+               and self.validate_description(description) \
+               and self.validate_type(settlement_percent, settlement_value) \
+               and self.validate_users_list(settlement_percent)
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa grupy powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_description(self, description):
+        valid = False
+        if len(description) > 255:
+            self.show_message('Opis nie powinien przekroczyć 255 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def validate_type(self, settlement_percent, settlement_value):
+        valid = False
+        if settlement_percent.state == 'normal' and settlement_value.state == 'normal':
+            self.show_message('Wybierz typ rozliczenia dla grupy.')
+        elif settlement_percent.state == 'down' and settlement_value.state == 'down':
+            self.show_message('Można wybrać tylko jeden typ rozliczenia.')
+        else:
+            valid = True
+        return valid
+
+    def validate_users_list(self, settlement_percent):
+        valid = False
+        all_users_valid = True
+        number_of_users = 0
+        users_list = []
+        priority_list = []
+        total_amount = 0
+        box = self.ids.box
+
+        for child in box.children[:]:
+            if child.id is not None and 'user' in child.id:
+                if self.validate_user(child, users_list):
+                    users_list.append(child.button_data['id'])
+                    number_of_users = number_of_users + 1
+                else:
+                    all_users_valid = False
+                    break
+            elif child.id is not None and 'amount' in child.id:
+                if self.validate_amount(child):
+                    total_amount = total_amount + float(child.text)
+                else:
+                    all_users_valid = False
+                    break
+            elif child.id is not None and 'priority' in child.id:
+                if self.validate_priority(child, priority_list):
+                    priority_list.append(int(child.text))
+                else:
+                    all_users_valid = False
+                    break
+
+        if not all_users_valid:
+            pass
+        elif number_of_users < 1:
+            self.show_message('Nie można utworzyć pustej grupy.')
+        elif settlement_percent.state == 'down' and total_amount != 100:
+            self.show_message('Dla rozliczenia procentowego suma procent członków grupy musi wynosić 100.')
+
+        else:
+            valid = True
+        return valid
+
+    def validate_user(self, user, users_list):
+        user_valid = False
+        print(users_list)
+        print('Validating user:', user.button_data)
+        if user.button_data['id'] == 0:
+            self.show_message('Uzupełnij dane wszystkich członków grupy.')
+            print('user id', user.button_data['id'])
+        elif user.button_data['id'] in users_list:
+            self.show_message('Wykryto zduplikowaną wartość "Użytkownik".')
+        else:
+            user_valid = True
+        return user_valid
+
+    def validate_amount(self, amount):
+        amount_valid = False
+        amount_regex = re.compile(r'([0-9]+\.?[0-9]{0,2})')
+        amount_match = re.search(amount_regex, amount.text)
+        if amount.text == '':
+            self.show_message('Uzupełnij dane wszystkich członków grupy.')
+        elif amount_match is None or amount_match.group(1) != amount.text:
+            self.show_message('Błędna kwota.')
+        else:
+            amount_valid = True
+        return amount_valid
+
+    def validate_priority(self, priority, priority_list):
+        priority_valid = False
+        if priority.text == '':
+            self.show_message('Uzupełnij dane wszystkich członków grupy.')
+            print('priority', priority.text)
+        elif int(priority.text) in priority_list:
+            self.show_message('Wykryto zduplikowaną wartość "priorytet".')
+        else:
+            priority_valid = True
+        return priority_valid
+
+    def load_group(self, group_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać grupę')
+        group = db_manager.get_group(group_id)
+        print(group)
+        return group
+
+    def load_users_from_group(self, group_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać członków grupy')
+        users_in_group = db_manager.get_all_users_from_group(group_id)
+        print(users_in_group)
+        return users_in_group
+
+    def check_in_database(self, name, description, settlement_percent):
+        db_manager = App.get_running_app().db_manager
+        settlement_type_id = 1 if settlement_percent.state == 'down' else 2
+        print('Próbuję dodać grupę')
+        group_id = db_manager.edit_group(self.group['group_id'], name, description, settlement_type_id,
+                                         is_main_group=False)
+
+        # adding users to user_group_tbl
+        box = self.ids.box
+        child_id_regex = re.compile(r'([0-9])+')
+
+        # collecting data
+
+        data = {}
+
+        for child in box.children:
+            if child.id is None:
+                pass
+            elif 'user' in child.id:
+                id = re.search(child_id_regex, child.id).group(1)
+                if id in data:
+                    data[id]['user_id'] = int(child.button_data['id'])
+                else:
+                    data[id] = {}
+                    data[id]['user_id'] = int(child.button_data['id'])
+            elif 'amount' in child.id:
+                id = re.search(child_id_regex, child.id).group(1)
+                if id in data:
+                    data[id]['amount'] = float(child.text)
+                else:
+                    data[id] = {}
+                    data[id]['amount'] = float(child.text)
+            elif 'priority' in child.id:
+                id = re.search(child_id_regex, child.id).group(1)
+                if id in data:
+                    data[id]['priority'] = int(child.text)
+                else:
+                    data[id] = {}
+                    data[id]['priority'] = int(child.text)
+
+        # adding, editing and removing users from group
+        print('data:', data)
+        current_ids_list = []
+        new_ids_list = []
+        for user in self.users_in_group:
+            current_ids_list.append(user['user_id'])
+        for k, v in data.items():
+            new_ids_list.append(v['user_id'])
+            if v['user_id'] not in current_ids_list:
+                print(f'Próbuję dodać usera: {v["user_id"]} do grupy')
+                db_manager.add_user_to_group(v['user_id'], self.group['group_id'], v['amount'], v['priority'])
+            else:
+                print(f'Próbuję edytować usera: {v["user_id"]}')
+                db_manager.edit_user_from_group(v['user_id'], self.group['group_id'], v['amount'], v['priority'])
+        print('current_ids_list:', current_ids_list)
+        print('new_ids_list:', new_ids_list)
+
+        for user_id in current_ids_list:
+            if user_id not in new_ids_list:
+                print(f'Próbuję usunąć usera: {user_id} z grupy')
+                db_manager.remove_user_from_group(user_id, self.group['group_id'])
+
+        return group_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+        self.ids.description.text = ''
+        self.ids.settlement_percent.state = 'down'
+        self.ids.settlement_value.state = 'normal'
+        self.highest_id = 0
+        self.ids.box.clear_widgets()
+        self.users_dropdowns = {}
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def compare_changes(self, name, description, settlement_percent, settlement_value):
+        self.clear_message()
+        print('Comparing changes in group:')
+        print(self.group)
+        has_changed = False
+        if self.group['name'] != name:
+            has_changed = True
+            print(self.group['name'], '!=', name)
+        elif self.group['description'] != description:
+            has_changed = True
+            print(self.group['description'], '!=', description)
+        elif self.group['settlement_type_id'] == 1 \
+                and (settlement_percent.state == 'normal' or settlement_value.state == 'down'):
+            has_changed = True
+            print('settlement_type_id has changed')
+        elif self.group['settlement_type_id'] == 2 \
+                and (settlement_percent.state == 'down' or settlement_value.state == 'normal'):
+            has_changed = True
+            print('settlement_type_id has changed')
+        else:
+            box = self.ids.box
+            child_id_regex = re.compile(r'([0-9])+')
+
+            # collecting data
+
+            data = {}
+
+            for child in box.children:
+                if child.id is None:
+                    pass
+                elif 'user' in child.id:
+                    id = re.search(child_id_regex, child.id).group(1)
+                    if id in data:
+                        data[id]['user_id'] = int(child.button_data['id'])
+                    else:
+                        data[id] = {}
+                        data[id]['user_id'] = int(child.button_data['id'])
+                elif 'amount' in child.id:
+                    id = re.search(child_id_regex, child.id).group(1)
+                    if id in data:
+                        data[id]['amount'] = float(child.text)
+                    else:
+                        data[id] = {}
+                        data[id]['amount'] = float(child.text)
+                elif 'priority' in child.id:
+                    id = re.search(child_id_regex, child.id).group(1)
+                    if id in data:
+                        data[id]['priority'] = int(child.text)
+                    else:
+                        data[id] = {}
+                        data[id]['priority'] = int(child.text)
+
+            # checking if there are differences between current users list and the new users list
+
+            if len(self.users_in_group) != len(data):
+                print('Number of users has changed.')
+                has_changed = True
+            else:
+                for new_user in data:
+                    has_changed = True
+                    for old_user in self.users_in_group:
+                        print('Checking user:', old_user)
+                        if (data[new_user]['user_id'] == old_user['user_id']
+                                and data[new_user]['amount'] == float(round(old_user['amount'], 2))
+                                and data[new_user]['priority'] == old_user['priority']):
+                            has_changed = False
+                            break
+                    if has_changed:
+                        print('User data has changed')
+                        print('Cannot find new user:', data[new_user])
+                        break
+        return has_changed
+
+    def update_user(self, name_field):
+        name = name_field.text
+
+        if self.validate_input(name) and self.compare_changes(name):
+            errors = self.check_in_database(name)
+            if errors is None:
+                print('user succesfully updated')
+                self.show_message(f'Zmiany dla użytkownika {name} zostały zapisane.')
+                self.user = self.load_user(self.user['user_id'])
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+    def update_group(self, name_field, description_field, settlement_percent, settlement_value):
+        name = name_field.text
+        description = description_field.text
+
+        if self.validate_input(name, description, settlement_percent, settlement_value) \
+                and self.compare_changes(name, description, settlement_percent, settlement_value):
+            errors = self.check_in_database(name, description, settlement_percent)
+            if errors is None:
+                print('group succesfully updated')
+                self.show_message(f'Zmiany dla grupy {name} zostały zapisane.')
+                self.group = self.load_group(self.group['group_id'])
+                self.users_in_group = self.load_users_from_group(self.group['group_id'])
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+
+class EditPaymentMethodScreen(Screen):
+    payment_method = ObjectProperty(None)
+
+    def on_pre_leave(self, *args):
+        self.clear_input_fields()
+
+    def on_pre_enter(self, *args):
+        self.payment_method = self.load_payment_method(App.get_running_app().root.label_id)
+        self.populate_fields()
+
+    def populate_fields(self):
+        self.ids.name.text = self.payment_method['name']
+
+    def clear_message(self):
+        self.ids.message.text = ''
+
+    def validate_input(self, name):
+        return self.validate_name(name)
+
+    def validate_name(self, name):
+        valid = False
+        if len(name) < 3:
+            self.show_message('Nazwa metody płatności powinna składać się z co najmniej 3 znaków.')
+        else:
+            valid = True
+        return valid
+
+    def load_payment_method(self, payment_method_id):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję wczytać metodę płatności')
+        payment_method = db_manager.get_payment_method(payment_method_id)
+        print(payment_method)
+        return payment_method
+
+    def check_in_database(self, name):
+        db_manager = App.get_running_app().db_manager
+        print('Próbuję dodać metodę płatności')
+        payment_method_id = db_manager.edit_payment_method(self.payment_method['payment_method_id'], name)
+        return payment_method_id
+
+    def clear_input_fields(self):
+        self.clear_message()
+        self.ids.name.text = ''
+
+    def compare_changes(self, name):
+        self.clear_message()
+        print('Comparing changes in payment method:')
+        print(self.payment_method)
+        has_changed = False
+        if self.payment_method['name'] != name:
+            has_changed = True
+            print(self.payment_method['name'], '!=', name)
+        return has_changed
+
+    def show_message(self, message):
+        self.ids.message.text = message
+
+    def update_payment_method(self, name_field):
+        name = name_field.text
+
+        if self.validate_input(name) and self.compare_changes(name):
+            errors = self.check_in_database(name)
+            if errors is None:
+                print('payment method succesfully updated')
+                self.show_message(f'Zmiany dla metody płatności {name} zostały zapisane.')
+                self.payment_method = self.load_payment_method(self.payment_method['payment_method_id'])
+            else:
+                self.show_message('Błąd, skontaktuj się z administratorem.')
+
+
 class CreateIncomeScreen(Screen):
     group_id = NumericProperty(0)
     category_id = NumericProperty(0)
@@ -686,6 +1848,8 @@ class CreateIncomeScreen(Screen):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
+        self.groups_dropdown.clear_widgets()
+        self.categories_dropdown.clear_widgets()
         self.add_groups_dropdown()
         self.add_categories_dropdown()
 
@@ -820,8 +1984,6 @@ class CreateIncomeScreen(Screen):
         self.ids.amount.text = ''
         self.ids.groups_btn.button_data = {'text': 'Wybierz', 'id': 0}
         self.ids.categories_btn.button_data = {'text': 'Wybierz', 'id': 0}
-        self.groups_dropdown.clear_widgets()
-        self.categories_dropdown.clear_widgets()
 
     def show_message(self, message):
         self.ids.message.text = message
@@ -1024,6 +2186,87 @@ class IncomesListScreen(Screen):
         return incomes_list
 
 
+class UsersListScreen(Screen):
+    def on_pre_enter(self, *args):
+        box = self.ids.box
+        users_list = self.get_users_list()
+        for user in users_list:
+            box.add_widget(SelectableLabel(text=f"{user['username']}", label_id=user['user_id']))
+
+    def on_pre_leave(self, *args):
+        self.ids.box.clear_widgets()
+
+    def get_users_list(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        print('Próbuję pobrać listę użytkowników')
+        users_list = db_manager.get_all_users(app.root.account_id)
+        print(users_list)
+        return users_list
+
+
+class GroupsListScreen(Screen):
+    def on_pre_enter(self, *args):
+        box = self.ids.box
+        groups_list = self.get_groups_list()
+        for group in groups_list:
+            box.add_widget(SelectableLabel(text=f"{group['name']}", label_id=group['group_id']))
+
+    def on_pre_leave(self, *args):
+        self.ids.box.clear_widgets()
+
+    def get_groups_list(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        print('Próbuję pobrać listę grup')
+        groups_list_all = db_manager.get_all_groups(app.root.account_id)
+        groups_list = []
+        for group in groups_list_all:
+            if not group['is_main_group']:
+                groups_list.append(group)
+        print(groups_list)
+        return groups_list
+
+
+class CategoriesListScreen(Screen):
+    def on_pre_enter(self, *args):
+        box = self.ids.box
+        categories_list = self.get_categories_list()
+        for category in categories_list:
+            box.add_widget(SelectableLabel(text=f"{category['name']}", label_id=category['category_id']))
+
+    def on_pre_leave(self, *args):
+        self.ids.box.clear_widgets()
+
+    def get_categories_list(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        print('Próbuję pobrać listę kategorii')
+        categories_list = db_manager.get_all_categories(app.root.account_id)
+        print(categories_list)
+        return categories_list
+
+
+class PaymentMethodsListScreen(Screen):
+    def on_pre_enter(self, *args):
+        box = self.ids.box
+        payment_methods_list = self.get_payment_methods_list()
+        for payment_method in payment_methods_list:
+            box.add_widget(SelectableLabel(text=f"{payment_method['name']}",
+                                           label_id=payment_method['payment_method_id']))
+
+    def on_pre_leave(self, *args):
+        self.ids.box.clear_widgets()
+
+    def get_payment_methods_list(self):
+        db_manager = App.get_running_app().db_manager
+        app = App.get_running_app()
+        print('Próbuję pobrać listę metod płatności')
+        payment_methods_list = db_manager.get_all_payment_methods(app.root.account_id)
+        print(payment_methods_list)
+        return payment_methods_list
+
+
 class CreateGroupScreen(Screen):
     users_dropdowns = DictProperty({})
     highest_id = 0
@@ -1174,9 +2417,12 @@ class CreateGroupScreen(Screen):
 
     def validate_amount(self, amount):
         amount_valid = False
+        amount_regex = re.compile(r'([0-9]+\.?[0-9]{0,2})')
+        amount_match = re.search(amount_regex, amount.text)
         if amount.text == '':
             self.show_message('Uzupełnij dane wszystkich członków grupy.')
-            print('amount', amount.text)
+        elif amount_match is None or amount_match.group(1) != amount.text:
+            self.show_message('Błędna kwota.')
         else:
             amount_valid = True
         return amount_valid
@@ -1214,23 +2460,20 @@ class CreateGroupScreen(Screen):
             if child.id is None:
                 pass
             elif 'user' in child.id:
-                print('CHILD ID:', child.id)
                 id = re.search(child_id_regex, child.id).group(1)
                 if id in data:
-                    data[id]['user'] = int(child.button_data['id'])
+                    data[id]['user_id'] = int(child.button_data['id'])
                 else:
                     data[id] = {}
-                    data[id]['user'] = int(child.button_data['id'])
+                    data[id]['user_id'] = int(child.button_data['id'])
             elif 'amount' in child.id:
-                print('CHILD ID:', child.id)
                 id = re.search(child_id_regex, child.id).group(1)
                 if id in data:
-                    data[id]['amount'] = int(child.text)
+                    data[id]['amount'] = float(child.text)
                 else:
                     data[id] = {}
-                    data[id]['amount'] = int(child.text)
+                    data[id]['amount'] = float(child.text)
             elif 'priority' in child.id:
-                print('CHILD ID:', child.id)
                 id = re.search(child_id_regex, child.id).group(1)
                 if id in data:
                     data[id]['priority'] = int(child.text)
@@ -1241,8 +2484,8 @@ class CreateGroupScreen(Screen):
         # adding users to group
         print('data:', data)
         for k, v in data.items():
-            print(f'Próbuję dodać usera: {v["user"]} do grupy')
-            db_manager.add_user_to_group(v['user'], group_id, v['amount'], v['priority'])
+            print(f'Próbuję dodać usera: {v["user_id"]} do grupy')
+            db_manager.add_user_to_group(v['user_id'], group_id, v['amount'], v['priority'])
 
         return group_id
 

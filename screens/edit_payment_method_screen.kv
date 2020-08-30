@@ -1,5 +1,5 @@
-<CreateCategoryScreen>:
-    name: 'create_category_screen'
+<EditPaymentMethodScreen>:
+    name: 'edit_payment_method_screen'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -37,7 +37,7 @@
                         font_size: 20
                         size_hint_y: None
                         height: 30
-                        text: 'Nazwa kategorii'
+                        text: 'Nazwa metody płatności'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -50,75 +50,6 @@
                         font_size: 15
                         size_hint_y: None
                         height: 30
-                BoxLayout:
-                    size_hint_y: None
-                    height: 80
-                    spacing: 10
-                    padding: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    BoxLayout:
-                        orientation: 'vertical'
-                        canvas:
-                            Color:
-                                rgba: 0, 0, 1, 0
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                        Label:
-                            font_size: 20
-                            size_hint_y: None
-                            height: 30
-                            text: 'Opis'
-                            canvas:
-                                Color:
-                                    rgba: 1, 0, 0, 0.5
-                                Rectangle:
-                                    pos: self.pos
-                                    size: self.size
-                        Widget:
-                    TextInput:
-                        id: description
-                        multiline: True
-                        font_size: 15
-                        size_hint_y: None
-                        height: 60
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    padding: 10
-                    spacing: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        size_hint_x: 2
-                        height: 30
-                        text: 'Typ'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    ToggleButton:
-                        id: expense_category
-                        text: 'wydatek'
-                        group: 'category_type'
-                        state: 'down'
-                    ToggleButton:
-                        id: income_category
-                        text: 'przychód'
-                        group: 'category_type'
                 BoxLayout:
                     size_hint_y: None
                     height: 50
@@ -136,7 +67,7 @@
                         size_hint_x: 0.5
                         height: 30
                         text: 'Powrót'
-                        on_release: app.root.current = 'categories_list_screen'
+                        on_release: app.root.current = 'payment_methods_list_screen'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -148,8 +79,8 @@
                         size_hint_y: None
                         size_hint_x: 0.5
                         height: 30
-                        text: 'Dodaj'
-                        on_release: root.add_category(root.ids.name, root.ids.description, root.ids.expense_category, root.ids.income_category)
+                        text: 'Zapisz zmiany'
+                        on_release: root.update_payment_method(root.ids.name)
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5

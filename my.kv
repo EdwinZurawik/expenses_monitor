@@ -1,37 +1,46 @@
-#: import categories screens.categories
-#: import users screens.users
-#: import expenses screens.expenses
-#: import incomes screens.incomes
-#: import groups screens.groups
-#: import payment_methods screens.payment_methods
-#: import login screens.login
-#: import create_account screens.create_account
+#: import categories screens.categories.categories
+#: include screens/categories/categories_list_screen.kv
+#: include screens/categories/create_category_screen.kv
+#: include screens/categories/edit_category_screen.kv
 
-#: include screens/login_screen.kv
-#: include screens/create_account_screen.kv
+#: import create_account screens.create_account.create_account
+#: include screens/create_account/create_account_screen.kv
+
+#: import expenses screens.expenses.expenses
+#: include screens/expenses/expenses_list_screen.kv
+#: include screens/expenses/create_expense_screen.kv
+#: include screens/expenses/edit_expense_screen.kv
+#: include screens/expenses/expense_details_screen.kv
+
+#: import groups screens.groups.groups
+#: include screens/groups/groups_list_screen.kv
+#: include screens/groups/create_group_screen.kv
+#: include screens/groups/edit_group_screen.kv
+
+#: import incomes screens.incomes.incomes
+#: include screens/incomes/incomes_list_screen.kv
+#: include screens/incomes/create_income_screen.kv
+#: include screens/incomes/edit_income_screen.kv
+#: include screens/incomes/income_details_screen.kv
+
+#: import login screens.login.login
+#: include screens/login/login_screen.kv
+
+#: import payment_methods screens.payment_methods.payment_methods
+#: include screens/payment_methods/payment_methods_list_screen.kv
+#: include screens/payment_methods/create_payment_method_screen.kv
+#: include screens/payment_methods/edit_payment_method_screen.kv
+
+#: import users screens.users.users
+#: include screens/users/users_list_screen.kv
+#: include screens/users/create_user_screen.kv
+#: include screens/users/edit_user_screen.kv
+
+#: import reports screens.reports.reports
+#: include screens/reports/reports_list_screen.kv
+#: include screens/reports/report_screens.kv
+
 #: include screens/menu_screen.kv
-#: include screens/expenses_list_screen.kv
-#: include screens/expense_details_screen.kv
-#: include screens/create_category_screen.kv
-#: include screens/create_user_screen.kv
-#: include screens/create_payment_method_screen.kv
-#: include screens/create_expense_screen.kv
-#: include screens/create_group_screen.kv
-#: include screens/incomes_list_screen.kv
-#: include screens/create_income_screen.kv
-#: include screens/income_details_screen.kv
-#: include screens/reports_list_screen.kv
-#: include screens/edit_expense_screen.kv
-#: include screens/edit_income_screen.kv
-#: include screens/users_list_screen.kv
-#: include screens/edit_user_screen.kv
-#: include screens/payment_methods_list_screen.kv
-#: include screens/edit_payment_method_screen.kv
-#: include screens/categories_list_screen.kv
-#: include screens/groups_list_screen.kv
-#: include screens/edit_category_screen.kv
-#: include screens/edit_group_screen.kv
-#: include screens/report_screens.kv
 
 #: import NoTransition kivy.uix.screenmanager.NoTransition
 

@@ -1,5 +1,6 @@
-<SettlementReportScreen>:
-    name: 'settlement_report_screen'
+#: import reports screens.reports
+<ReportScreen>:
+    name: 'Raport'
     FloatLayout:
         FloatLayout:
             size_hint: None, None
@@ -34,10 +35,11 @@
                             size: self.size
                     Widget:
                     Label:
+                        id: report_name
                         font_size: 20
                         size_hint_y: None
                         height: 30
-                        text: 'Raport rozliczenia'
+                        text: 'Raport'
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -169,7 +171,7 @@
                         size_hint_x: 0.5
                         height: 30
                         text: 'Generuj raport'
-                        on_release: root.print_settlement_report(date_from, date_to)
+                        on_release: root.print_report(date_from, date_to)
                         canvas:
                             Color:
                                 rgba: 1, 0, 0, 0.5
@@ -195,6 +197,19 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
+                Label:
+                    id: summary
+                    font_size: 20
+                    size_hint_y: None
+                    height: 30
+                    text: ''
+                    halign: 'left'
+                    canvas:
+                        Color:
+                            rgba: 1, 0, 0, 0.5
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
                 Widget:
                 Label:
                     id: message
@@ -208,3 +223,12 @@
                         Rectangle:
                             pos: self.pos
                             size: self.size
+
+<BalanceReportScreen>:
+    name: 'balance_report_screen'
+
+<SettlementReportScreen>:
+    name: 'settlement_report_screen'
+
+<PaymentMethodReportScreen>:
+    name: 'payment_method_report_screen'

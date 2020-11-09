@@ -1,3 +1,12 @@
+#: import categories screens.categories
+#: import users screens.users
+#: import expenses screens.expenses
+#: import incomes screens.incomes
+#: import groups screens.groups
+#: import payment_methods screens.payment_methods
+#: import login screens.login
+#: import create_account screens.create_account
+
 #: include screens/login_screen.kv
 #: include screens/create_account_screen.kv
 #: include screens/menu_screen.kv
@@ -7,7 +16,6 @@
 #: include screens/create_user_screen.kv
 #: include screens/create_payment_method_screen.kv
 #: include screens/create_expense_screen.kv
-#: include screens/ip_address_screen.kv
 #: include screens/create_group_screen.kv
 #: include screens/incomes_list_screen.kv
 #: include screens/create_income_screen.kv
@@ -29,7 +37,6 @@
 
 <MyScreenManager>:
     transition: NoTransition()
-    #IpAddressScreen: #not needed for now
     LoginScreen:
     CreateAccountScreen:
     MenuScreen:

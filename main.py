@@ -1,7 +1,6 @@
 import re
 
-import mysql.connector
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.properties import NumericProperty, ObjectProperty
 from kivy.properties import StringProperty
 from kivy.uix.button import Button
@@ -92,7 +91,7 @@ class SelectableLabel(Label):
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
-            app = App.get_running_app()
+            app = MDApp.get_running_app()
             app.root.label_clicked(self.label_id)
             print('label id: ', self.label_id)
 
@@ -101,7 +100,7 @@ class ScrollableLabel(ScrollView):
     text = StringProperty('')
 
 
-class MyApp(App):
+class MyApp(MDApp):
     db_manager = DatabaseManager()
 
     def build(self):

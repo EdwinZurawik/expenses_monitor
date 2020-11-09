@@ -1,0 +1,44 @@
+<CenteredButton>:
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    halign: 'center'
+    md_bg_color: app.theme_cls.primary_light
+
+<CenteredTextField>:
+    size_hint_x: 0.9
+    halign: 'center'
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    multiline: False
+
+<CenteredErrorLabel>:
+    theme_text_color: 'Error'
+    halign: 'center'
+    pos_hint: {'center_x': .5, 'center_y': .5}
+
+<CenteredLabel>:
+    halign: 'center'
+    pos_hint: {'center_x': .5, 'center_y': .5}
+
+<VerticalBoxLayout>:
+    spacing: 5
+    orientation: 'vertical'
+
+<HorizontalBoxLayout>:
+    spacing: 10
+    padding: 10
+
+<TopToolbar>:
+    id: toolbar
+    pos_hint: {"top": 1}
+    elevation: 10
+    title: "Title"
+    left_action_items: [["menu", lambda x: app.root.ids.nav_drawer.set_state('toggle')]]
+
+<CenteredDateTextField>:
+    text: str(self.selected_date)
+    on_focus:
+        if self.focus: self.show_date_picker()
+
+<CenteredDropdownTextField>:
+    text: str(self.selected_item)
+    on_focus:
+        if self.focus: self.menu.open()

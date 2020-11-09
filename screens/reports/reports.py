@@ -4,12 +4,12 @@ import re
 from kivy.app import App
 from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.dropdown import DropDown
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
 from database_manager.DatabaseManager import DatabaseManager
 from main import ButtonWithData
 from reports import PaymentMethodReport, BalanceReport, SettlementReport
+from screens.gui_elements import CenteredLabel
 
 
 class ReportsListScreen(Screen):
@@ -123,7 +123,7 @@ class SettlementReportScreen(ReportScreen):
             report_data = self.generate_report(date_from, date_to)
 
             for item in report_data:
-                box.add_widget(Label(text=item, halign='left'))
+                box.add_widget(CenteredLabel(text=item))
             self.show_message('')
 
     def generate_report(self, date_from, date_to):
@@ -160,9 +160,9 @@ class BalanceReportScreen(ReportScreen):
             balance = report_data["summary"]["incomes"] - report_data["summary"]["expenses"]
 
             for item in report_data['expenses']:
-                box.add_widget(Label(text=item, halign='left'))
+                box.add_widget(CenteredLabel(text=item))
             for item in report_data['incomes']:
-                box.add_widget(Label(text=item, halign='left'))
+                box.add_widget(CenteredLabel(text=item))
 
             self.ids.summary.text = f'Wydatki: {report_data["summary"]["expenses"]} zł ' \
                                     f'| Przychody: {report_data["summary"]["incomes"]} zł ' \
@@ -207,7 +207,7 @@ class PaymentMethodReportScreen(ReportScreen):
             report_data = self.generate_report(date_from, date_to)
 
             for item in report_data:
-                box.add_widget(Label(text=item, halign='left'))
+                box.add_widget(CenteredLabel(text=item))
             self.show_message('')
 
     def generate_report(self, date_from, date_to):

@@ -4,16 +4,13 @@
         Widget:
         CenteredTextField:
             id: name
-            multiline: False
             hint_text: 'Nazwa'
         CenteredTextField:
             id: date
-            multiline: False
             hint_text: 'Data'
-            CenteredTextField:
-                id: description
-                multiline: True
-                font_size: 15
+        CenteredMultilineTextField:
+            id: description
+            hint_text: 'Opis'
         HorizontalBoxLayout:
             CenteredLabel:
                 text: 'Zapłacone przez:'
@@ -34,7 +31,6 @@
                 text: 'Wybierz'
         FloatInput:
             id: amount
-            multiline: False
             hint_text: 'Kwota (zł)'
         HorizontalBoxLayout:
             CenteredLabel:

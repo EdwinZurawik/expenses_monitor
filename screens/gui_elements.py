@@ -9,11 +9,15 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.list import OneLineListItem
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.picker import MDDatePicker
-from kivymd.uix.textfield import MDTextField
+from kivymd.uix.textfield import MDTextField, MDTextFieldRect
 from kivymd.uix.toolbar import MDToolbar
 
 
 class CenteredTextField(MDTextField):
+    pass
+
+
+class CenteredMultilineTextField(MDTextFieldRect):
     pass
 
 

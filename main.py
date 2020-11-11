@@ -1,16 +1,12 @@
-import re
-
-from kivymd.app import MDApp
 from kivy.properties import NumericProperty, ObjectProperty
 from kivy.properties import StringProperty
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.textinput import TextInput
+from kivymd.app import MDApp
 
 from database_manager.DatabaseManager import DatabaseManager
-from screens.gui_elements import CenteredButton
 
 
 class MyScreenManager(ScreenManager):

@@ -5,7 +5,6 @@ from kivy.properties import NumericProperty, ObjectProperty
 from kivy.properties import StringProperty
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput

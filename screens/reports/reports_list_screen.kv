@@ -1,77 +1,20 @@
 <ReportsListScreen>:
     name: 'reports_list_screen'
-    FloatLayout:
-        FloatLayout:
-            size_hint: None, None
-            size: root.width * 0.9, root.height * 0.9
-            center: self.parent.center
-            canvas:
-                Color:
-                    rgba: 0.5, 0.5, 0.5, 0.5
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-            BoxLayout:
-                spacing: 3
-                padding: 10
-                orientation: 'vertical'
-                pos: self.parent.pos
-                canvas:
-                    Color:
-                        rgba: 1, 0, 0, 0
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                Widget:
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Raport bilansu'
-                    on_release: app.root.current = 'balance_report_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Raport rozliczenia'
-                    on_release: app.root.current = 'settlement_report_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Raport metod płatności'
-                    on_release: app.root.current = 'payment_method_report_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Widget:
-                    size_hint_y: None
-                    height: 10
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Powrót'
-                    on_release: app.root.current = 'menu_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Widget:
+    VerticalBoxLayout:
+        Widget:
+        CenteredButton:
+            text: 'Raport bilansu'
+            on_release: app.root.current = 'balance_report_screen'
+        CenteredButton:
+            text: 'Raport rozliczenia'
+            on_release: app.root.current = 'settlement_report_screen'
+        CenteredButton:
+            text: 'Raport metod płatności'
+            on_release: app.root.current = 'payment_method_report_screen'
+        Widget:
+            size_hint_y: None
+            height: 10
+        CenteredButton:
+            text: 'Powrót'
+            on_release: app.root.current = 'menu_screen'
+        Widget:

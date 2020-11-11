@@ -1,137 +1,35 @@
 <MenuScreen>:
     name: 'menu_screen'
-    FloatLayout:
-        FloatLayout:
-            size_hint: None, None
-            size: root.width * 0.9, root.height * 0.9
-            center: self.parent.center
-            canvas:
-                Color:
-                    rgba: 0.5, 0.5, 0.5, 0.5
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-            BoxLayout:
-                spacing: 3
-                padding: 10
-                orientation: 'vertical'
-                pos: self.parent.pos
-                canvas:
-                    Color:
-                        rgba: 1, 0, 0, 0
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                Widget:
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Wydatki'
-                    on_release: app.root.current = 'expenses_list_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Przychody'
-                    on_release: app.root.current = 'incomes_list_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Raporty'
-                    on_release: app.root.current = 'reports_list_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    font_size: 20
-                    size_hint_y: None
-                    height: 30
-                    text: 'Kategorie'
-                    on_release: app.root.current = 'categories_list_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    font_size: 20
-                    size_hint_y: None
-                    height: 30
-                    text: 'Użytkownicy'
-                    on_release: app.root.current = 'users_list_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    font_size: 20
-                    size_hint_y: None
-                    height: 30
-                    text: 'Grupy'
-                    on_release: app.root.current = 'groups_list_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    font_size: 20
-                    size_hint_y: None
-                    height: 30
-                    text: 'Metody płatności'
-                    on_release: app.root.current = 'payment_methods_list_screen'
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Widget:
-                    size_hint_y: None
-                    height: 10
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Wyloguj się'
-                    on_release: app.root.logout()
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Button:
-                    size_hint_y: None
-                    font_size: 20
-                    height: 30
-                    text: 'Wyjdź'
-                    on_release: app.stop()
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                Widget:
+    VerticalBoxLayout:
+        Widget:
+        CenteredButton:
+            text: 'Wydatki'
+            on_release: app.root.current = 'expenses_list_screen'
+        CenteredButton:
+            text: 'Przychody'
+            on_release: app.root.current = 'incomes_list_screen'
+        CenteredButton:
+            text: 'Raporty'
+            on_release: app.root.current = 'reports_list_screen'
+        CenteredButton:
+            text: 'Kategorie'
+            on_release: app.root.current = 'categories_list_screen'
+        CenteredButton:
+            text: 'Użytkownicy'
+            on_release: app.root.current = 'users_list_screen'
+        CenteredButton:
+            text: 'Grupy'
+            on_release: app.root.current = 'groups_list_screen'
+        CenteredButton:
+            text: 'Metody płatności'
+            on_release: app.root.current = 'payment_methods_list_screen'
+        Widget:
+            size_hint_y: None
+            height: 10
+        CenteredButton:
+            text: 'Wyloguj się'
+            on_release: app.root.logout()
+        CenteredButton:
+            text: 'Wyjdź'
+            on_release: app.stop()
+        Widget:

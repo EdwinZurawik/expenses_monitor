@@ -436,9 +436,9 @@ class IncomeDetailsScreen(Screen):
         self.ids.name.text = self.income['income_name']
         self.ids.date.text = self.income['operation_date'].strftime('%d.%m.%Y')
         self.ids.description.text = self.income['description']
-        self.ids.group.text = self.income['group_name']
-        self.ids.category.text = self.income['category_name']
-        self.ids.amount.text = str(round(self.income['amount'], 2)) + ' zł'
+        self.ids.group.text = ' '.join(['Kto otrzymał:', self.income['group_name']])
+        self.ids.category.text = ' '.join(['Kategoria:', self.income['category_name']])
+        self.ids.amount.text = ' '.join(['Kwota:', str(round(self.income['amount'], 2)), 'zł'])
 
     def clear_fields(self):
         self.ids.name.text = ''

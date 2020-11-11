@@ -597,7 +597,7 @@ class ExpenseDetailsScreen(Screen):
         self.ids.payer.text = ' '.join(['Zapłacone przez:', self.expense['username']])
         self.ids.group.text =  ' '.join(['Grupa:', self.expense['group_name']])
         self.ids.category.text = ' '.join(['Kategoria:', self.expense['category_name']])
-        self.ids.amount.text = ' '.join(['Kwota:', str(round(self.expense['amount'], 2)) + ' zł'])
+        self.ids.amount.text = ' '.join(['Kwota:', str(round(self.expense['amount'], 2)), 'zł'])
         self.ids.payment_method.text = ' '.join(['Metoda płatności:', self.expense['payment_method_name']])
 
     def clear_fields(self):

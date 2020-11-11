@@ -594,11 +594,11 @@ class ExpenseDetailsScreen(Screen):
         self.ids.name.text = self.expense['expense_name']
         self.ids.date.text = self.expense['operation_date'].strftime('%d.%m.%Y')
         self.ids.description.text = self.expense['description']
-        self.ids.payer.text = self.expense['username']
-        self.ids.group.text = self.expense['group_name']
-        self.ids.category.text = self.expense['category_name']
-        self.ids.amount.text = str(round(self.expense['amount'], 2)) + ' zł'
-        self.ids.payment_method.text = self.expense['payment_method_name']
+        self.ids.payer.text = ' '.join(['Zapłacone przez:', self.expense['username']])
+        self.ids.group.text =  ' '.join(['Grupa:', self.expense['group_name']])
+        self.ids.category.text = ' '.join(['Kategoria:', self.expense['category_name']])
+        self.ids.amount.text = ' '.join(['Kwota:', str(round(self.expense['amount'], 2)) + ' zł'])
+        self.ids.payment_method.text = ' '.join(['Metoda płatności:', self.expense['payment_method_name']])
 
     def clear_fields(self):
         self.ids.name.text = ''

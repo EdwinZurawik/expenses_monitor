@@ -10,6 +10,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 
 from database_manager.DatabaseManager import DatabaseManager
+from screens.gui_elements import CenteredButton
 
 
 class MyScreenManager(ScreenManager):
@@ -54,27 +55,6 @@ class ButtonWithData(Button):
 
     def on_button_data(self, *args):
         self.text = self.button_data['text']
-
-
-class FloatInput(TextInput):
-    pat = re.compile('[^0-9]')
-
-    def insert_text(self, substring, from_undo=False):
-        pat = self.pat
-        if '.' in self.text:
-            s = re.sub(pat, '', substring)
-        else:
-            s = '.'.join([re.sub(pat, '', s) for s in substring.split('.', 1)])
-        return super(FloatInput, self).insert_text(s, from_undo=from_undo)
-
-
-class IntegerInput(TextInput):
-    pat = re.compile('[^0-9]')
-
-    def insert_text(self, substring, from_undo=False):
-        pat = self.pat
-        s = re.sub(pat, '', substring)
-        return super(IntegerInput, self).insert_text(s, from_undo=from_undo)
 
 
 class CustomDropdown(DropDown):

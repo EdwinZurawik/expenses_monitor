@@ -6,8 +6,8 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
-from main import ButtonWithData, IntegerInput, FloatInput
-from screens.gui_elements import SelectableListItem
+from main import ButtonWithData
+from screens.gui_elements import SelectableListItem, FloatInput, IntegerInput
 
 
 class GroupsListScreen(Screen):

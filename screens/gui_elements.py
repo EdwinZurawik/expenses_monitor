@@ -1,3 +1,5 @@
+import re
+
 from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.app import MDApp
@@ -88,3 +90,24 @@ class SelectableListItem(OneLineListItem):
             app = MDApp.get_running_app()
             app.root.label_clicked(self.item_id)
             print('item id: ', self.item_id)
+
+
+class FloatInput(CenteredTextField):
+    pat = re.compile('[^0-9]')
+
+    def insert_text(self, substring, from_undo=False):
+        pat = self.pat
+        if '.' in self.text:
+            s = re.sub(pat, '', substring)
+        else:
+            s = '.'.join([re.sub(pat, '', s) for s in substring.split('.', 1)])
+        return super(FloatInput, self).insert_text(s, from_undo=from_undo)
+
+
+class IntegerInput(CenteredTextField):
+    pat = re.compile('[^0-9]')
+
+    def insert_text(self, substring, from_undo=False):
+        pat = self.pat
+        s = re.sub(pat, '', substring)
+        return super(IntegerInput, self).insert_text(s, from_undo=from_undo)

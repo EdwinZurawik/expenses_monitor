@@ -1,35 +1,35 @@
 <MenuScreen>:
     name: 'menu_screen'
     VerticalBoxLayout:
-        Widget:
-        CenteredButton:
-            text: 'Wydatki'
-            on_release: app.root.current = 'expenses_list_screen'
-        CenteredButton:
-            text: 'Przychody'
-            on_release: app.root.current = 'incomes_list_screen'
-        CenteredButton:
-            text: 'Raporty'
-            on_release: app.root.current = 'reports_list_screen'
-        CenteredButton:
-            text: 'Kategorie'
-            on_release: app.root.current = 'categories_list_screen'
-        CenteredButton:
-            text: 'Użytkownicy'
-            on_release: app.root.current = 'users_list_screen'
-        CenteredButton:
-            text: 'Grupy'
-            on_release: app.root.current = 'groups_list_screen'
-        CenteredButton:
-            text: 'Metody płatności'
-            on_release: app.root.current = 'payment_methods_list_screen'
-        Widget:
-            size_hint_y: None
-            height: 10
-        CenteredButton:
-            text: 'Wyloguj się'
-            on_release: app.root.logout()
-        CenteredButton:
-            text: 'Wyjdź'
-            on_release: app.stop()
-        Widget:
+        ScrollView:
+            MDList:
+                OneLineListItem:
+                    text: 'Wydatki'
+                    on_release: app.root.current = 'expenses_list_screen'
+                OneLineListItem:
+                    text: 'Przychody'
+                    on_release: app.root.current = 'incomes_list_screen'
+                OneLineListItem:
+                    text: 'Raporty'
+                    on_release: app.root.current = 'reports_list_screen'
+                OneLineListItem:
+                    text: 'Kategorie'
+                    on_release: app.root.current = 'categories_list_screen'
+                OneLineListItem:
+                    text: 'Użytkownicy'
+                    on_release: app.root.current = 'users_list_screen'
+                OneLineListItem:
+                    text: 'Grupy'
+                    on_release: app.root.current = 'groups_list_screen'
+                OneLineListItem:
+                    text: 'Metody płatności'
+                    on_release: app.root.current = 'payment_methods_list_screen'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Wyloguj się'
+                on_release: app.root.logout()
+            CenteredButton:
+                text: 'Wyjdź'
+                on_release: app.stop()

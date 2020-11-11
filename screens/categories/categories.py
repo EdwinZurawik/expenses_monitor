@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
 
-from main import SelectableLabel
+from screens.gui_elements import SelectableListItem
 
 
 class CategoriesListScreen(Screen):
@@ -10,7 +10,7 @@ class CategoriesListScreen(Screen):
         box = self.ids.box
         categories_list = self.get_categories_list()
         for category in categories_list:
-            box.add_widget(SelectableLabel(text=f"{category['name']}", label_id=category['category_id']))
+            box.add_widget(SelectableListItem(text=f"{category['name']}", item_id=category['category_id']))
 
     def on_pre_leave(self, *args):
         self.ids.box.clear_widgets()
@@ -103,7 +103,7 @@ class EditCategoryScreen(Screen):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
-        self.category = self.load_category(App.get_running_app().root.label_id)
+        self.category = self.load_category(App.get_running_app().root.item_id)
         self.populate_fields()
 
     def populate_fields(self):

@@ -6,7 +6,8 @@ from kivy.properties import NumericProperty, ObjectProperty
 from kivy.uix.dropdown import DropDown
 from kivy.uix.screenmanager import Screen
 
-from main import SelectableLabel, ButtonWithData
+from main import ButtonWithData
+from screens.gui_elements import SelectableListItem
 
 
 class IncomesListScreen(Screen):
@@ -14,11 +15,13 @@ class IncomesListScreen(Screen):
         box = self.ids.box
         incomes_list = self.get_incomes_list()
         for income in incomes_list:
-            box.add_widget(SelectableLabel(text=f"{income['group_name']}: "
-                                                f"{income['income_name']} - "
-                                                f"{round(income['amount'], 2)} zł - "
-                                                f"{income['operation_date'].strftime('%d.%m.%Y')}",
-                                           label_id=income['income_id']))
+            income_str = "".join([f"{income['group_name']}: ",
+                                  f"{income['income_name']} - ",
+                                  f"{round(income['amount'], 2)} zł - ",
+                                  f"{income['operation_date'].strftime('%d.%m.%Y')}"
+                                  ])
+            box.add_widget(SelectableListItem(text=income_str,
+                                              item_id=income['income_id']))
 
     def on_pre_leave(self, *args):
         self.ids.box.clear_widgets()
@@ -209,7 +212,7 @@ class EditIncomeScreen(Screen):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
-        self.income = self.load_income(App.get_running_app().root.label_id)
+        self.income = self.load_income(App.get_running_app().root.item_id)
         self.add_groups_dropdown()
         self.add_categories_dropdown()
         self.populate_fields()
@@ -415,8 +418,8 @@ class IncomeDetailsScreen(Screen):
     income = ObjectProperty(None)
 
     def on_pre_enter(self, *args):
-        print(App.get_running_app().root.label_id)
-        self.income = self.check_in_database(App.get_running_app().root.label_id)
+        print(App.get_running_app().root.item_id)
+        self.income = self.check_in_database(App.get_running_app().root.item_id)
         self.populate_fields()
 
     def on_pre_leave(self, *args):

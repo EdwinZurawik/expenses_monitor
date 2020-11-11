@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
 
-from main import SelectableLabel
+from screens.gui_elements import SelectableListItem
 
 
 class UsersListScreen(Screen):
@@ -10,7 +10,7 @@ class UsersListScreen(Screen):
         box = self.ids.box
         users_list = self.get_users_list()
         for user in users_list:
-            box.add_widget(SelectableLabel(text=f"{user['username']}", label_id=user['user_id']))
+            box.add_widget(SelectableListItem(text=f"{user['username']}", item_id=user['user_id']))
 
     def on_pre_leave(self, *args):
         self.ids.box.clear_widgets()
@@ -78,7 +78,7 @@ class EditUserScreen(Screen):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
-        self.user = self.load_user(App.get_running_app().root.label_id)
+        self.user = self.load_user(App.get_running_app().root.item_id)
         self.populate_fields()
 
     def populate_fields(self):

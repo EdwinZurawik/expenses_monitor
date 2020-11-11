@@ -6,7 +6,8 @@ from kivy.properties import NumericProperty, ObjectProperty
 from kivy.uix.dropdown import DropDown
 from kivy.app import App
 
-from main import ButtonWithData, SelectableLabel
+from main import ButtonWithData
+from screens.gui_elements import SelectableListItem
 
 
 class ExpensesListScreen(Screen):
@@ -14,10 +15,13 @@ class ExpensesListScreen(Screen):
         box = self.ids.box
         expenses_list = self.get_expenses_list()
         for expense in expenses_list:
-            box.add_widget(SelectableLabel(text=f"{expense['expense_name']} [{expense['category_name']}] - "
-                                                f"{round(expense['amount'], 2)} zł - "
-                                                f"{expense['operation_date'].strftime('%d.%m.%Y')}",
-                                           label_id=expense['expense_id']))
+            expense_str = "".join([f"{expense['operation_date'].strftime('%d.%m.%Y')} --- ",
+                                   f"{round(expense['amount'], 2)} zł --- ",
+                                   f"{expense['expense_name']} ",
+                                   f"[{expense['category_name']}]"
+                                   ])
+            box.add_widget(SelectableListItem(text=expense_str,
+                                              item_id=expense['expense_id']))
 
     def on_pre_leave(self, *args):
         self.ids.box.clear_widgets()
@@ -301,7 +305,7 @@ class EditExpenseScreen(Screen):
         self.ids.amount.text = str(round(self.expense['amount'], 2))
 
     def on_pre_enter(self, *args):
-        self.expense = self.load_expense(App.get_running_app().root.label_id)
+        self.expense = self.load_expense(App.get_running_app().root.item_id)
         self.add_payers_dropdown()
         self.add_groups_dropdown()
         self.add_categories_dropdown()
@@ -573,7 +577,7 @@ class ExpenseDetailsScreen(Screen):
     expense = ObjectProperty(None)
 
     def on_pre_enter(self, *args):
-        self.expense = self.check_in_database(App.get_running_app().root.label_id)
+        self.expense = self.check_in_database(App.get_running_app().root.item_id)
         self.populate_fields()
 
     def on_pre_leave(self, *args):

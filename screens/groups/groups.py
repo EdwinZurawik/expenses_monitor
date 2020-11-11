@@ -6,7 +6,8 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
-from main import ButtonWithData, IntegerInput, FloatInput, SelectableLabel
+from main import ButtonWithData, IntegerInput, FloatInput
+from screens.gui_elements import SelectableListItem
 
 
 class GroupsListScreen(Screen):
@@ -14,7 +15,7 @@ class GroupsListScreen(Screen):
         box = self.ids.box
         groups_list = self.get_groups_list()
         for group in groups_list:
-            box.add_widget(SelectableLabel(text=f"{group['name']}", label_id=group['group_id']))
+            box.add_widget(SelectableListItem(text=f"{group['name']}", item_id=group['group_id']))
 
     def on_pre_leave(self, *args):
         self.ids.box.clear_widgets()
@@ -311,7 +312,7 @@ class EditGroupScreen(Screen):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
-        group_id = App.get_running_app().root.label_id
+        group_id = App.get_running_app().root.item_id
         self.group = self.load_group(group_id)
         self.users_in_group = self.load_users_from_group(group_id)
         self.populate_fields()

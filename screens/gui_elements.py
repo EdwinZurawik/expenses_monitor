@@ -1,8 +1,10 @@
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.label import MDLabel
+from kivymd.uix.list import OneLineListItem
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.picker import MDDatePicker
 from kivymd.uix.textfield import MDTextField
@@ -72,3 +74,17 @@ class TopToolbar(MDToolbar):
 class ContentNavigationDrawer(BoxLayout):
     screen_manager = ObjectProperty()
     nav_drawer = ObjectProperty()
+
+
+class SelectableListItem(OneLineListItem):
+    item_id = NumericProperty()
+
+    def __init__(self, **kwargs):
+        super(SelectableListItem, self).__init__(**kwargs)
+        self.item_id = kwargs['item_id']
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            app = MDApp.get_running_app()
+            app.root.label_clicked(self.item_id)
+            print('item id: ', self.item_id)

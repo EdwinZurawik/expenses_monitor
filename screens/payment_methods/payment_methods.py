@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
 
-from main import SelectableLabel
+from screens.gui_elements import SelectableListItem
 
 
 class PaymentMethodsListScreen(Screen):
@@ -10,8 +10,8 @@ class PaymentMethodsListScreen(Screen):
         box = self.ids.box
         payment_methods_list = self.get_payment_methods_list()
         for payment_method in payment_methods_list:
-            box.add_widget(SelectableLabel(text=f"{payment_method['name']}",
-                                           label_id=payment_method['payment_method_id']))
+            box.add_widget(SelectableListItem(text=f"{payment_method['name']}",
+                                           item_id=payment_method['payment_method_id']))
 
     def on_pre_leave(self, *args):
         self.ids.box.clear_widgets()
@@ -80,7 +80,7 @@ class EditPaymentMethodScreen(Screen):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
-        self.payment_method = self.load_payment_method(App.get_running_app().root.label_id)
+        self.payment_method = self.load_payment_method(App.get_running_app().root.item_id)
         self.populate_fields()
 
     def populate_fields(self):

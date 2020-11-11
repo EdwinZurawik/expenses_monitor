@@ -15,10 +15,10 @@ from database_manager.DatabaseManager import DatabaseManager
 
 class MyScreenManager(ScreenManager):
     account_id = NumericProperty(None)
-    label_id = NumericProperty(None)
+    item_id = NumericProperty(None)
 
-    def label_clicked(self, label_id):
-        self.label_id = label_id
+    def label_clicked(self, item_id):
+        self.item_id = item_id
         destination_screen = self.current_screen.name
         print(self.current_screen.name)
         if self.current_screen.name == 'expenses_list_screen':
@@ -80,20 +80,6 @@ class IntegerInput(TextInput):
 
 class CustomDropdown(DropDown):
     pass
-
-
-class SelectableLabel(Label):
-    label_id = NumericProperty()
-
-    def __init__(self, **kwargs):
-        super(SelectableLabel, self).__init__(**kwargs)
-        self.label_id = kwargs['label_id']
-
-    def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
-            app = MDApp.get_running_app()
-            app.root.label_clicked(self.label_id)
-            print('label id: ', self.label_id)
 
 
 class ScrollableLabel(ScrollView):

@@ -6,8 +6,7 @@ from kivy.properties import NumericProperty, ObjectProperty
 from kivy.uix.dropdown import DropDown
 from kivy.uix.screenmanager import Screen
 
-from main import ButtonWithData
-from screens.gui_elements import SelectableListItem
+from screens.gui_elements import SelectableListItem, ButtonWithData
 
 
 class IncomesListScreen(Screen):
@@ -59,8 +58,6 @@ class CreateIncomeScreen(Screen):
         for group in groups_list:
             if group['is_main_group']:
                 btn = ButtonWithData(text=group['name'],
-                                     size_hint_y=None,
-                                     height='30',
                                      button_data={'text': group['name'], 'id': group['group_id']})
                 btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
                 self.groups_dropdown.add_widget(btn)
@@ -77,8 +74,6 @@ class CreateIncomeScreen(Screen):
         for category in categories_list:
             if category['category_type_id'] == 2:
                 btn = ButtonWithData(text=category['name'],
-                                     size_hint_y=None,
-                                     height='30',
                                      button_data={'text': category['name'], 'id': category['category_id']})
                 btn.bind(on_release=lambda btn: self.categories_dropdown.select(btn.button_data))
                 self.categories_dropdown.add_widget(btn)
@@ -236,8 +231,6 @@ class EditIncomeScreen(Screen):
         for group in groups_list:
             if group['is_main_group']:
                 btn = ButtonWithData(text=group['name'],
-                                     size_hint_y=None,
-                                     height='30',
                                      button_data={'text': group['name'], 'id': group['group_id']})
                 btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
                 self.groups_dropdown.add_widget(btn)
@@ -254,8 +247,6 @@ class EditIncomeScreen(Screen):
         for category in categories_list:
             if category['category_type_id'] == 2:
                 btn = ButtonWithData(text=category['name'],
-                                     size_hint_y=None,
-                                     height='30',
                                      button_data={'text': category['name'], 'id': category['category_id']})
                 btn.bind(on_release=lambda btn: self.categories_dropdown.select(btn.button_data))
                 self.categories_dropdown.add_widget(btn)

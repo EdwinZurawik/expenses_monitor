@@ -7,9 +7,8 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.screenmanager import Screen
 
 from database_manager.DatabaseManager import DatabaseManager
-from main import ButtonWithData
 from reports import PaymentMethodReport, BalanceReport, SettlementReport
-from screens.gui_elements import CenteredLabel
+from screens.gui_elements import CenteredLabel, ButtonWithData
 
 
 class ReportsListScreen(Screen):
@@ -36,8 +35,6 @@ class ReportScreen(Screen):
 
         for group in groups_list:
             btn = ButtonWithData(text=group['name'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': group['name'], 'id': group['group_id']})
             btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
             self.groups_dropdown.add_widget(btn)

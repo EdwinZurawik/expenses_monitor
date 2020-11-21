@@ -6,8 +6,7 @@ from kivy.properties import NumericProperty, ObjectProperty
 from kivy.uix.dropdown import DropDown
 from kivy.app import App
 
-from main import ButtonWithData
-from screens.gui_elements import SelectableListItem
+from screens.gui_elements import SelectableListItem, ButtonWithData
 
 
 class ExpensesListScreen(Screen):
@@ -66,8 +65,6 @@ class CreateExpenseScreen(Screen):
 
         for user in users_list:
             btn = ButtonWithData(text=user['username'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': user['username'], 'id': user['user_id']})
             btn.bind(on_release=lambda btn: self.payers_dropdown.select(btn.button_data))
             self.payers_dropdown.add_widget(btn)
@@ -83,8 +80,6 @@ class CreateExpenseScreen(Screen):
 
         for group in groups_list:
             btn = ButtonWithData(text=group['name'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': group['name'], 'id': group['group_id']})
             btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
             self.groups_dropdown.add_widget(btn)
@@ -101,8 +96,6 @@ class CreateExpenseScreen(Screen):
         for category in categories_list:
             if category['category_type_id'] == 1:
                 btn = ButtonWithData(text=category['name'],
-                                     size_hint_y=None,
-                                     height='30',
                                      button_data={'text': category['name'], 'id': category['category_id']})
                 btn.bind(on_release=lambda btn: self.categories_dropdown.select(btn.button_data))
                 self.categories_dropdown.add_widget(btn)
@@ -118,8 +111,6 @@ class CreateExpenseScreen(Screen):
 
         for payment_method in payment_methods_list:
             btn = ButtonWithData(text=payment_method['name'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': payment_method['name'],
                                               'id': payment_method['payment_method_id']})
             btn.bind(on_release=lambda btn: self.payment_methods_dropdown.select(btn.button_data))
@@ -320,8 +311,6 @@ class EditExpenseScreen(Screen):
 
         for user in users_list:
             btn = ButtonWithData(text=user['username'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': user['username'], 'id': user['user_id']})
             btn.bind(on_release=lambda btn: self.payers_dropdown.select(btn.button_data))
             self.payers_dropdown.add_widget(btn)
@@ -337,8 +326,6 @@ class EditExpenseScreen(Screen):
 
         for group in groups_list:
             btn = ButtonWithData(text=group['name'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': group['name'], 'id': group['group_id']})
             btn.bind(on_release=lambda btn: self.groups_dropdown.select(btn.button_data))
             self.groups_dropdown.add_widget(btn)
@@ -355,8 +342,6 @@ class EditExpenseScreen(Screen):
         for category in categories_list:
             if category['category_type_id'] == 1:
                 btn = ButtonWithData(text=category['name'],
-                                     size_hint_y=None,
-                                     height='30',
                                      button_data={'text': category['name'], 'id': category['category_id']})
                 btn.bind(on_release=lambda btn: self.categories_dropdown.select(btn.button_data))
                 self.categories_dropdown.add_widget(btn)
@@ -372,8 +357,6 @@ class EditExpenseScreen(Screen):
 
         for payment_method in payment_methods_list:
             btn = ButtonWithData(text=payment_method['name'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': payment_method['name'],
                                               'id': payment_method['payment_method_id']})
             btn.bind(on_release=lambda btn: self.payment_methods_dropdown.select(btn.button_data))

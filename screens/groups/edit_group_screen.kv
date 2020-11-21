@@ -1,259 +1,66 @@
 <EditGroupScreen>:
     name: 'edit_group_screen'
-    FloatLayout:
-        FloatLayout:
-            size_hint: None, None
-            size: root.width * 0.9, root.height * 0.9
-            center: self.parent.center
-            canvas:
-                Color:
-                    rgba: 0.5, 0.5, 0.5, 0.5
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-            BoxLayout:
-                orientation: 'vertical'
-                pos: self.parent.pos
-                canvas:
-                    Color:
-                        rgba: 1, 0, 0, 0
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                Widget:
-                BoxLayout:
+    VerticalBoxLayout:
+        CenteredTextField:
+            id: name
+            hint_text: 'Nazwa grupy'
+        CenteredMultilineTextField:
+            size_hint_y: 2
+            id: description
+            hint_text: 'Opis'
+        GridLayout:
+            cols: 3
+            size_hint_x: 0.9
+            row_default_height: 30
+            CenteredLabel:
+                text: 'Typ rozliczenia'
+            ToggleButton:
+                id: settlement_percent
+                height: 30
+                size_hint_y: None
+                text: 'procentowe'
+                group: 'settlement_type'
+                state: 'down'
+            ToggleButton:
+                height: 30
+                size_hint_y: None
+                id: settlement_value
+                text: 'kwotowe'
+                group: 'settlement_type'
+        VerticalBoxLayout:
+            size_hint_y: 5
+            CenteredButton:
+                text: 'Dodaj'
+                on_release: root.add_user_field()
+            HorizontalBoxLayout:
+                adaptive_height: True
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                CenteredLabel:
+                    text: 'Użytkownik'
+                CenteredLabel:
+                    text: 'Kwota/procent'
+                CenteredLabel:
+                    text: 'Priorytet'
+                CenteredLabel:
+                    text: 'Usuń'
+            ScrollView: # wypełniony członkami grupy
+                size_hint_x: 0.9
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                GridLayout:
+                    spacing: 5
+                    cols: 4
                     size_hint_y: None
-                    height: 40
-                    padding: 10
-                    spacing: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        height: 30
-                        text: 'Nazwa grupy'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    TextInput:
-                        id: name
-                        multiline: False
-                        font_size: 15
-                        size_hint_y: None
-                        height: 30
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                FloatLayout:
-                    size_hint_y: None
-                    height: 100
-                    center: self.parent.center
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    BoxLayout:
-                        padding: 10
-                        spacing: 10
-                        pos: self.parent.pos
-                        BoxLayout:
-                            orientation: 'vertical'
-                            Label:
-                                text: 'Opis'
-                                size_hint_y: None
-                                height: 30
-                                font_size: 20
-                                canvas:
-                                    Color:
-                                        rgba: 1, 0, 0, 0.5
-                                    Rectangle:
-                                        pos: self.pos
-                                        size: self.size
-                            Widget:
-                        TextInput:
-                            id: description
-                            multiline: True
-                            font_size: 15
-                            canvas:
-                                Color:
-                                    rgba: 1, 0, 0, 0.5
-                                Rectangle:
-                                    pos: self.pos
-                                    size: self.size
-                BoxLayout:
-                    size_hint_y: None
-                    height: 40
-                    padding: 10
-                    spacing: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        font_size: 20
-                        size_hint_y: None
-                        size_hint_x: 2
-                        height: 30
-                        text: 'Typ rozliczenia'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    ToggleButton:
-                        id: settlement_percent
-                        text: 'procentowe'
-                        group: 'settlement_type'
-                        state: 'down'
-                    ToggleButton:
-                        id: settlement_value
-                        text: 'kwotowe'
-                        group: 'settlement_type'
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: 3
-                    canvas:
-                        Color:
-                            rgba: 0.2, 0.4, 0.3, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    BoxLayout:
-                        padding: 10
-                        spacing: 5
-                        size_hint_x: 0.1
-                        orientation: 'vertical'
-                        Widget:
-                            size_hint_y: None
-                            height: 20
-                        Button:
-                            size_hint_y: None
-                            text: '+'
-                            height: 30
-                            padding_y: 20
-                            spacing: 10
-                            on_release: root.add_user_field()
-                            canvas:
-                                Color:
-                                    rgba: 1, 0.4, 0.3, 0.5
-                                Rectangle:
-                                    pos: self.pos
-                                    size: self.size
-                        Widget:
-                    ScrollView: # wypełniony członkami grupy
-                        size_hint_x: 0.9
-                        GridLayout:
-                            spacing: 5
-                            cols: 4
-                            orientation: 'vertical'
-                            size_hint_y: None
-                            row_default_height: 30
-                            height: self.minimum_height
-                            id: box
-                            canvas:
-                                Color:
-                                    rgba: 0, 1, 0, 0
-                                Rectangle:
-                                    pos: self.pos
-                                    size: self.size
-                            Label:
-                                size_hint_x: 0.25
-                                size_hint_y: None
-                                height: 20
-                                font_size: 15
-                                text: 'Użytkownik'
-                            Label:
-                                size_hint_x: 0.35
-                                size_hint_y: None
-                                height: 20
-                                font_size: 15
-                                text: 'Kwota/procent'
-                            Label:
-                                size_hint_x: 0.30
-                                size_hint_y: None
-                                height: 20
-                                font_size: 15
-                                text: 'Priorytet'
-                            Label:
-                                size_hint_x: 0.10
-                                size_hint_y: None
-                                height: 20
-                                font_size: 15
-                                text: 'Usuń'
-                BoxLayout:
-                    size_hint_y: None
-                    height: 50
-                    padding_y: 20
-                    spacing: 10
-                    canvas:
-                        Color:
-                            rgba: 0, 0, 1, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Button:
-                        font_size: 20
-                        size_hint_y: None
-                        size_hint_x: 0.5
-                        height: 30
-                        text: 'Powrót'
-                        on_release: app.root.current = 'groups_list_screen'
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                    Button:
-                        font_size: 20
-                        size_hint_y: None
-                        size_hint_x: 0.5
-                        height: 30
-                        text: 'Zapisz zmiany'
-                        on_release: root.update_group(root.ids.name, root.ids.description, root.ids.settlement_percent, root.ids.settlement_value)
-                        canvas:
-                            Color:
-                                rgba: 1, 0, 0, 0.5
-                            Rectangle:
-                                pos: self.pos
-                                size: self.size
-                Widget:
-                Label:
-                    id: message
-                    font_size: 20
-                    size_hint_y: None
-                    height: 30
-                    text: ''
-                    canvas:
-                        Color:
-                            rgba: 1, 0, 0, 0.5
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-
-#<CustomDropdown>:
-#    DropDown:
-#        id: payers
-#        canvas:
-#            Color:
-#                rgba: 1, 0, 0, 0.5
-#            Rectangle:
-#                pos: self.pos
-#                size: self.size
-#        on_select: mainbtn.text = f'{args[1]}'
+                    row_default_height: 30
+                    height: self.minimum_height
+                    id: box
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'groups_list_screen'
+            CenteredButton:
+                text: 'Dodaj'
+                on_release: root.add_group(root.ids.name, root.ids.description, root.ids.settlement_percent, root.ids.settlement_value)
+        CenteredErrorLabel:
+            id: message

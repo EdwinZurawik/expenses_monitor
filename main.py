@@ -1,6 +1,5 @@
-from kivy.properties import NumericProperty, ObjectProperty
+from kivy.properties import NumericProperty
 from kivy.properties import StringProperty
-from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scrollview import ScrollView
@@ -44,13 +43,6 @@ class MyScreenManager(ScreenManager):
 
 class MenuScreen(Screen):
     pass
-
-
-class ButtonWithData(Button):
-    button_data = ObjectProperty({'text': '', 'id': 0})
-
-    def on_button_data(self, *args):
-        self.text = self.button_data['text']
 
 
 class CustomDropdown(DropDown):

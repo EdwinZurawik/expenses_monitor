@@ -1,6 +1,5 @@
 <CenteredButton>:
     pos_hint: {'center_x': .5, 'center_y': .5}
-    halign: 'center'
     md_bg_color: app.theme_cls.primary_light
 
 <CenteredTextField>:
@@ -47,3 +46,7 @@
     text: str(self.selected_item)
     on_focus:
         if self.focus: self.menu.open()
+
+<ButtonWithData>:
+    height: 30
+    size_hint_y: None

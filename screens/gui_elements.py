@@ -2,6 +2,7 @@ import re
 
 from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDRaisedButton
@@ -115,3 +116,10 @@ class IntegerInput(CenteredTextField):
         pat = self.pat
         s = re.sub(pat, '', substring)
         return super(IntegerInput, self).insert_text(s, from_undo=from_undo)
+
+
+class ButtonWithData(Button):
+    button_data = ObjectProperty({'text': '', 'id': 0})
+
+    def on_button_data(self, *args):
+        self.text = self.button_data['text']

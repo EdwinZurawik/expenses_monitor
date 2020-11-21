@@ -3,11 +3,9 @@ import re
 from kivy.app import App
 from kivy.properties import ObjectProperty, DictProperty
 from kivy.uix.dropdown import DropDown
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
-from main import ButtonWithData
-from screens.gui_elements import SelectableListItem, FloatInput, IntegerInput
+from screens.gui_elements import SelectableListItem, FloatInput, IntegerInput, ButtonWithData
 
 
 class GroupsListScreen(Screen):
@@ -42,12 +40,12 @@ class CreateGroupScreen(Screen):
 
     def add_user_field(self):
         self.highest_id += 1
-        deletebtn = ButtonWithData(text='-', size_hint_x=0.25, id=f'delete{self.highest_id}')
+        deletebtn = ButtonWithData(text='-', id=f'delete{self.highest_id}')
         userbtn = ButtonWithData(button_data={'text': 'Wybierz', 'id': 0},
-                                 size_hint_x=0.35, id=f'user{self.highest_id}')
+                                 id=f'user{self.highest_id}')
         widgets = [userbtn,
-                   FloatInput(text='', font_size=18, size_hint_x=0.30, id=f'amount{self.highest_id}'),
-                   IntegerInput(text='', font_size=18, size_hint_x=0.10, id=f'priority{self.highest_id}'),
+                   FloatInput(text='', id=f'amount{self.highest_id}'),
+                   IntegerInput(text='', id=f'priority{self.highest_id}'),
                    deletebtn]
         deletebtn.bind(on_release=lambda btn: self.remove_user_field(btn.id))
 
@@ -86,8 +84,6 @@ class CreateGroupScreen(Screen):
 
         for user in users_list:
             btn = ButtonWithData(text=user['username'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': user['username'], 'id': user['user_id']})
             btn.bind(on_release=lambda btn: self.users_dropdowns[id].select(btn.button_data))
             self.users_dropdowns[id].add_widget(btn)
@@ -263,26 +259,6 @@ class CreateGroupScreen(Screen):
         self.ids.settlement_value.state = 'normal'
         self.highest_id = 0
         self.ids.box.clear_widgets()
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Użytkownik'))
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Kwota/procent'))
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Priorytet'))
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Usuń'))
         self.users_dropdowns = {}
 
     def show_message(self, message):
@@ -334,12 +310,12 @@ class EditGroupScreen(Screen):
 
     def add_user_field(self, b_text='Wybierz', b_id=0, amount='', priority=''):
         self.highest_id += 1
-        deletebtn = ButtonWithData(text='-', size_hint_x=0.25, id=f'delete{self.highest_id}')
+        deletebtn = ButtonWithData(text='-', id=f'delete{self.highest_id}')
         userbtn = ButtonWithData(button_data={'text': b_text, 'id': b_id},
-                                 size_hint_x=0.35, id=f'user{self.highest_id}')
+                                 id=f'user{self.highest_id}')
         widgets = [userbtn,
-                   FloatInput(text=amount, font_size=18, size_hint_x=0.30, id=f'amount{self.highest_id}'),
-                   IntegerInput(text=priority, font_size=18, size_hint_x=0.10, id=f'priority{self.highest_id}'),
+                   FloatInput(text=amount, id=f'amount{self.highest_id}'),
+                   IntegerInput(text=priority, id=f'priority{self.highest_id}'),
                    deletebtn]
         deletebtn.bind(on_release=lambda btn: self.remove_user_field(btn.id))
 
@@ -378,8 +354,6 @@ class EditGroupScreen(Screen):
 
         for user in users_list:
             btn = ButtonWithData(text=user['username'],
-                                 size_hint_y=None,
-                                 height='30',
                                  button_data={'text': user['username'], 'id': user['user_id']})
             btn.bind(on_release=lambda btn: self.users_dropdowns[id].select(btn.button_data))
             self.users_dropdowns[id].add_widget(btn)
@@ -582,26 +556,6 @@ class EditGroupScreen(Screen):
         self.ids.settlement_value.state = 'normal'
         self.highest_id = 0
         self.ids.box.clear_widgets()
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Użytkownik'))
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Kwota/procent'))
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Priorytet'))
-        self.ids.box.add_widget(Label(size_hint_x=0.25,
-                                      size_hint_y=None,
-                                      height=20,
-                                      font_size=15,
-                                      text='Usuń'))
         self.users_dropdowns = {}
 
     def show_message(self, message):

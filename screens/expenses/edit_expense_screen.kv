@@ -3,11 +3,14 @@
     VerticalBoxLayout:
         Widget:
         CenteredTextField:
-            id: name
-            hint_text: 'Nazwa'
-        CenteredTextField:
             id: date
             hint_text: 'Data'
+        CenteredTextField:
+            id: name
+            hint_text: 'Nazwa'
+        FloatInput:
+            id: amount
+            hint_text: 'Kwota (zł)'
         CenteredMultilineTextField:
             id: description
             hint_text: 'Opis'
@@ -30,9 +33,6 @@
             ButtonWithData:
                 id: categories_btn
                 text: 'Wybierz'
-        FloatInput:
-            id: amount
-            hint_text: 'Kwota (zł)'
         HorizontalBoxLayout:
             CenteredLabel:
                 text: 'Metoda płatności:'

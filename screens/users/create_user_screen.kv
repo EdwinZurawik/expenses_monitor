@@ -1,0 +1,19 @@
+<CreateUserScreen>:
+    name: 'create_user_screen'
+    VerticalBoxLayout:
+        id: main_box
+        Widget:
+        CenteredTextField:
+            id: name
+            hint_text: 'Nazwa użytkownika'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'users_list_screen'
+            CenteredButton:
+                text: 'Dodaj'
+                on_release: root.add_user(root.ids.name)
+        CenteredErrorLabel:
+            id: message

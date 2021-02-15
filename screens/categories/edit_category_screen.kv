@@ -1,0 +1,38 @@
+<EditCategoryScreen>:
+    name: 'edit_category_screen'
+    VerticalBoxLayout:
+        Widget:
+        CenteredTextField:
+            id: name
+            hint_text: 'Nazwa kategorii'
+        CenteredMultilineTextField:
+            id: description
+            hint_text: 'Opis'
+        GridLayout:
+            cols: 3
+            size_hint_x: 0.9
+            size_hint_y: None
+            height: 40
+            CenteredLabel:
+                text: 'Typ'
+            ToggleButton:
+                id: expense_category
+                text: 'wydatek'
+                group: 'category_type'
+                state: 'down'
+            ToggleButton:
+                id: income_category
+                text: 'przychód'
+                group: 'category_type'
+        Widget:
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'categories_list_screen'
+            CenteredButton:
+                text: 'Zapisz zmiany'
+                on_release: root.update_category(root.ids.name, root.ids.description, root.ids.expense_category, root.ids.income_category)
+        CenteredErrorLabel:
+            id: message

@@ -1,0 +1,26 @@
+<LoginScreen>:
+    name: 'login_screen'
+    VerticalBoxLayout:
+        Widget:
+        CenteredTextField:
+            id: username
+            hint_text: 'Nazwa konta'
+        CenteredTextField:
+            id: password
+            password: True
+            hint_text: 'Hasło'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Nie masz konta? Zarejestruj się'
+                on_release: app.root.current = 'create_account_screen'
+            CenteredButton:
+                text: 'Zaloguj się'
+                on_release: root.login(root.ids.username, root.ids.password)
+        CenteredButton:
+            text: 'Wyjdź'
+            on_release: app.stop()
+        Widget:
+        CenteredErrorLabel:
+            id: message

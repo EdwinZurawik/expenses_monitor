@@ -1,0 +1,15 @@
+<CategoriesListScreen>:
+    name: 'categories_list_screen'
+    VerticalBoxLayout:
+        ScrollView:
+            MDList:
+                id: box
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'menu_screen'
+            CenteredButton:
+                text: 'Dodaj'
+                on_release: app.root.current = 'create_category_screen'

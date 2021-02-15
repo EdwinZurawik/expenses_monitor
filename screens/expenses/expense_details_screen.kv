@@ -1,0 +1,58 @@
+<ExpenseDetailsScreen>:
+    name: 'expense_details_screen'
+    VerticalBoxLayout:
+        Widget:
+        HorizontalBoxLayout:
+            CenteredLabel:
+                id: name
+                text: ''
+            CenteredLabel:
+                id: date
+        FloatLayout:
+            size_hint_y: None
+            height: 100
+            center: self.parent.center
+            BoxLayout:
+                padding: 10
+                pos: self.parent.pos
+                ScrollableLabel:
+                    id: description
+                    pos: self.parent.pos
+                    canvas:
+                        Color:
+                            rgba: 0.2, 0.1, 0.3, 0.25
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+        CenteredLabel:
+            id: payer
+        CenteredLabel:
+            id: group
+        CenteredLabel:
+            id: category
+        CenteredLabel:
+            id: amount
+        CenteredLabel:
+            id: payment_method
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Edytuj'
+                on_release: app.root.current = 'edit_expense_screen'
+            CenteredButton:
+                text: 'Usuń'
+                on_release:
+        CenteredButton:
+            text: 'Powrót'
+            on_release: app.root.current = 'expenses_list_screen'
+        Widget:
+
+
+<ScrollableLabel>:
+    text: str('hello '*100)
+    CenteredLabel:
+        text: root.text
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]

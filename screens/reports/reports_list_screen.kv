@@ -1,0 +1,20 @@
+<ReportsListScreen>:
+    name: 'reports_list_screen'
+    VerticalBoxLayout:
+        ScrollView:
+            MDList:
+                OneLineListItem:
+                    text: 'Raport bilansu'
+                    on_release: app.root.current = 'balance_report_screen'
+                OneLineListItem:
+                    text: 'Raport rozliczenia'
+                    on_release: app.root.current = 'settlement_report_screen'
+                OneLineListItem:
+                    text: 'Raport metod płatności'
+                    on_release: app.root.current = 'payment_method_report_screen'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'menu_screen'

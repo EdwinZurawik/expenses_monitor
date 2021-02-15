@@ -1,0 +1,40 @@
+<EditIncomeScreen>:
+    name: 'edit_income_screen'
+    VerticalBoxLayout:
+        Widget:
+        CenteredTextField:
+            id: name
+            hint_text: 'Nazwa'
+        CenteredTextField:
+            id: date
+            hint_text: 'Data'
+        CenteredMultilineTextField:
+            id: description
+            hint_text: 'Opis'
+        HorizontalBoxLayout:
+            CenteredLabel:
+                text: 'Kto otrzymał:'
+            ButtonWithData:
+                id: groups_btn
+                text: 'Wybierz'
+        HorizontalBoxLayout:
+            CenteredLabel:
+                text: 'Kategoria:'
+            ButtonWithData:
+                id: categories_btn
+                text: 'Wybierz'
+        FloatInput:
+            id: amount
+            hint_text: 'Kwota (zł)'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'income_details_screen'
+            CenteredButton:
+                text: 'Zapisz zmiany'
+                on_release: root.update_income(root.ids.name, root.ids.date, root.ids.description, root.ids.amount)
+        Widget:
+        CenteredErrorLabel:
+            id: message

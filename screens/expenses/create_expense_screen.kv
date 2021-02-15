@@ -1,0 +1,52 @@
+<CreateExpenseScreen>:
+    name: 'create_expense_screen'
+    VerticalBoxLayout:
+        Widget:
+        CenteredTextField:
+            id: date
+            hint_text: 'Data'
+        CenteredTextField:
+            id: name
+            hint_text: 'Nazwa'
+        FloatInput:
+            id: amount
+            hint_text: 'Kwota (zł)'
+        CenteredMultilineTextField:
+            id: description
+            hint_text: 'Opis'
+        HorizontalBoxLayout:
+            CenteredLabel:
+                text: 'Zapłacone przez:'
+            ButtonWithData:
+                id: payers_btn
+                text: 'Wybierz'
+        HorizontalBoxLayout:
+            CenteredLabel:
+                text: 'Grupa:'
+            ButtonWithData:
+                id: groups_btn
+                text: 'Wybierz'
+        HorizontalBoxLayout:
+            CenteredLabel:
+                text: 'Kategoria:'
+            ButtonWithData:
+                id: categories_btn
+                text: 'Wybierz'
+        HorizontalBoxLayout:
+            CenteredLabel:
+                text: 'Metoda płatności:'
+            ButtonWithData:
+                id: payment_methods_btn
+                text: 'Wybierz'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'expenses_list_screen'
+            CenteredButton:
+                text: 'Dodaj'
+                on_release: root.add_expense(root.ids.name, root.ids.date, root.ids.description, root.ids.amount)
+        Widget:
+        CenteredErrorLabel:
+            id: message

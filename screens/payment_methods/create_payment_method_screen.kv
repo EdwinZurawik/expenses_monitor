@@ -1,0 +1,19 @@
+<CreatePaymentMethodScreen>:
+    name: 'create_payment_method_screen'
+    VerticalBoxLayout:
+        id: main_box
+        Widget:
+        CenteredTextField:
+            id: name
+            hint_text: 'Nazwa metody płatności'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Powrót'
+                on_release: app.root.current = 'payment_methods_list_screen'
+            CenteredButton:
+                text: 'Dodaj'
+                on_release: root.add_payment_method(root.ids.name)
+        CenteredErrorLabel:
+            id: message

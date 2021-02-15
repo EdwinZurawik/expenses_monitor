@@ -1,0 +1,30 @@
+<CreateAccountScreen>:
+    name: 'create_account_screen'
+    VerticalBoxLayout:
+        id: main_box
+        Widget:
+        CenteredTextField:
+            id: username
+            hint_text: 'Nazwa konta'
+        CenteredTextField:
+            id: password
+            password: True
+            hint_text: 'Hasło'
+        CenteredTextField:
+            id: email
+            hint_text: 'Adres e-mail'
+        HorizontalBoxLayout:
+            adaptive_size: True
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            CenteredButton:
+                text: 'Wróć do ekranu logowania'
+                on_release: app.root.current = 'login_screen'
+            CenteredButton:
+                text: 'Załóż konto'
+                on_release: root.create_account(username, password, email)
+        CenteredButton:
+            text: 'Wyjdź'
+            on_release: app.stop()
+        Widget:
+        CenteredErrorLabel:
+            id: message

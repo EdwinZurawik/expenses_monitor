@@ -3,6 +3,8 @@ from database_manager.DatabaseManager import DatabaseManager
 
 class SettlementReport:
     manager = DatabaseManager()
+    name = 'Raport rozliczenia'
+    id = 2
 
     def get_data_from_db(self, account_id, report_group_id, date_from, date_to):
         expenses_list = self.manager.get_all_expenses_between_dates(account_id, date_from, date_to)
@@ -100,6 +102,18 @@ class SettlementReport:
                 if member_id in member_ids:
                     to_settle = self.add_element_to_dict_of_dicts(payer_id, member_id, outcome, to_settle)
         return to_settle
+
+    def prepare_report(self, data):
+        report_lines = []
+        for lender in data:
+            lender_name = self.manager.get_user(lender)['username']
+            for debtor in data[lender]:
+                debtor_name = self.manager.get_user(debtor)['username']
+
+                report_lines.append(f'{debtor_name} jest winien/winna {lender_name} kwotę: {data[lender][debtor]} zł.')
+
+        report_data = {'results': report_lines, 'summary': ''}
+        return report_data
 
     def add_element_to_dict_of_dicts(self, first_key, second_key, element, dictionary):
         if first_key in dictionary:

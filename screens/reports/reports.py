@@ -2,12 +2,12 @@ import datetime
 import re
 
 from kivy.app import App
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import NumericProperty, StringProperty, ObjectProperty
 from kivy.uix.dropdown import DropDown
 from kivy.uix.screenmanager import Screen
+from kivymd.uix.picker import MDDatePicker
 
-from database_manager.DatabaseManager import DatabaseManager
-from reports import PaymentMethodReport, BalanceReport, SettlementReport
+from reports import ReportFactory, BalanceReport, SettlementReport, PaymentMethodReport
 from screens.gui_elements import CenteredLabel, ButtonWithData
 
 
@@ -19,14 +19,23 @@ class ReportScreen(Screen):
     group_id = NumericProperty(0)
     category_id = NumericProperty(0)
     groups_dropdown = DropDown()
-    report_name = StringProperty('Raport')
+    reports_dropdown = DropDown()
+    date_from = StringProperty('')
+    date_to = StringProperty('')
+    report = ObjectProperty(0)
+
+    reports_list = [
+        {'id': 1, 'name': 'BalanceReport', 'name_pl': 'Raport bilansu'},
+        {'id': 2, 'name': 'SettlementReport', 'name_pl': 'Raport rozliczenia'},
+        {'id': 3, 'name': 'PaymentMethodReport', 'name_pl': 'Raport metod płatności'},
+    ]
 
     def on_pre_leave(self, *args):
         self.clear_input_fields()
 
     def on_pre_enter(self, *args):
         self.add_groups_dropdown()
-        self.ids.report_name.text = self.report_name
+        self.add_reports_dropdown()
 
     def add_groups_dropdown(self):
         db_manager = App.get_running_app().db_manager
@@ -42,15 +51,33 @@ class ReportScreen(Screen):
         groups_btn.bind(on_release=self.groups_dropdown.open)
         self.groups_dropdown.bind(on_select=lambda instance, x: setattr(groups_btn, 'button_data', x))
 
+    def add_reports_dropdown(self):
+
+        for report in self.reports_list:
+            btn = ButtonWithData(text=report['name_pl'],
+                                 button_data={'text': report['name_pl'], 'id': report['id']})
+            btn.bind(on_release=lambda btn: self.reports_dropdown.select(btn.button_data))
+            self.reports_dropdown.add_widget(btn)
+        reports_btn = self.ids.reports_btn
+        reports_btn.bind(on_release=self.reports_dropdown.open)
+        self.reports_dropdown.bind(on_select=lambda instance, x: setattr(reports_btn, 'button_data', x))
+
     def set_group_id(self):
         self.group_id = self.ids.groups_btn.button_data['id']
+
+    def set_report(self):
+        for report in self.reports_list:
+            if report['id'] == self.ids.reports_btn.button_data['id']:
+                self.report = ReportFactory.ReportFactory.factory(report['name'])
+                break
 
     def clear_message(self):
         self.ids.message.text = ''
 
     def validate_input(self, date_from, date_to):
         return self.validate_dates(date_from, date_to) \
-               and self.validate_group_id()
+               and self.validate_group_id() \
+               and self.validate_report()
 
     def validate_dates(self, date_from, date_to):
         valid = False
@@ -76,6 +103,24 @@ class ReportScreen(Screen):
             valid = True
         return valid
 
+    def show_datepicker(self):
+        picker = MDDatePicker(mode='range')
+        picker.bind(on_save=self.save_date, on_cancel=self.cancel_save_date)
+        picker.open()
+
+    def save_date(self, instance, value, date_range):
+        if not date_range:
+            value = value.strftime('%d.%m.%Y')
+            self.date_from = str(value)
+            self.date_to = str(value)
+        else:
+            self.date_from = date_range[0].strftime('%d.%m.%Y')
+            self.date_to = date_range[-1].strftime('%d.%m.%Y')
+        print(self.date_from, self.date_to)
+
+    def cancel_save_date(self, instance, value):
+        pass
+
     def validate_group_id(self):
         valid = False
         self.set_group_id()
@@ -85,141 +130,51 @@ class ReportScreen(Screen):
             valid = True
         return valid
 
+    def validate_report(self):
+        valid = False
+        self.set_report()
+        if self.report == 0:
+            self.show_message('Wybór raportu jest obowiązkowy.')
+        else:
+            valid = True
+        return valid
+
     def clear_input_fields(self):
         self.clear_message()
-        self.ids.date_from.text = ''
-        self.ids.date_to.text = ''
+        self.date_to = ''
+        self.date_from = ''
         self.ids.summary.text = ''
         self.ids.groups_btn.button_data = {'text': 'Wybierz', 'id': 0}
+        self.ids.reports_btn.button_data = {'text': 'Wybierz', 'id': 0}
         self.groups_dropdown.clear_widgets()
+        self.reports_dropdown.clear_widgets()
+        self.report = 0
         self.ids.box.clear_widgets()
 
     def show_message(self, message):
         self.ids.message.text = message
 
-    def print_report(self, date_from_field, date_to_field):
-        pass
-
-    def generate_report(self, date_from, date_to):
-        pass
-
-
-class SettlementReportScreen(ReportScreen):
-    report_name = 'Raport rozliczenia'
-
-    def print_report(self, date_from_field, date_to_field):
+    def print_report(self):
         box = self.ids.box
         self.ids.box.clear_widgets()
-        date_from = date_from_field.text
-        date_to = date_to_field.text
-
-        if self.validate_input(date_from, date_to):
-            date_from = datetime.datetime.strptime(date_from, '%d.%m.%Y')
-            date_to = datetime.datetime.strptime(date_to, '%d.%m.%Y')
+        if self.validate_input(self.date_from, self.date_to):
+            date_from = datetime.datetime.strptime(self.date_from, '%d.%m.%Y')
+            date_to = datetime.datetime.strptime(self.date_to, '%d.%m.%Y')
 
             report_data = self.generate_report(date_from, date_to)
 
-            for item in report_data:
+            for item in report_data['results']:
                 box.add_widget(CenteredLabel(text=item))
+
+            self.ids.summary.text = report_data['summary']
             self.show_message('')
 
     def generate_report(self, date_from, date_to):
         account_id = App.get_running_app().root.account_id
-        db_manager = DatabaseManager()
-        report = SettlementReport.SettlementReport()
-        data = report.generate_report_data(account_id, self.group_id, date_from, date_to)
-        report_lines = []
-        for lender in data:
-            lender_name = db_manager.get_user(lender)['username']
-            for debtor in data[lender]:
-                debtor_name = db_manager.get_user(debtor)['username']
-
-                report_lines.append(f'{debtor_name} jest winien/winna {lender_name} kwotę: {data[lender][debtor]} zł.')
-
-        report_data = report_lines
-        return report_data
-
-
-class BalanceReportScreen(ReportScreen):
-    report_name = 'Raport bilansu'
-
-    def print_report(self, date_from_field, date_to_field):
-        box = self.ids.box
-        self.ids.box.clear_widgets()
-        date_from = date_from_field.text
-        date_to = date_to_field.text
-
-        if self.validate_input(date_from, date_to):
-            date_from = datetime.datetime.strptime(date_from, '%d.%m.%Y')
-            date_to = datetime.datetime.strptime(date_to, '%d.%m.%Y')
-
-            report_data = self.generate_report(date_from, date_to)
-            balance = report_data["summary"]["incomes"] - report_data["summary"]["expenses"]
-
-            for item in report_data['expenses']:
-                box.add_widget(CenteredLabel(text=item))
-            for item in report_data['incomes']:
-                box.add_widget(CenteredLabel(text=item))
-
-            self.ids.summary.text = f'Wydatki: {report_data["summary"]["expenses"]} zł ' \
-                                    f'| Przychody: {report_data["summary"]["incomes"]} zł ' \
-                                    f'| Bilans: {balance} zł.'
-            self.show_message('')
-
-    def generate_report(self, date_from, date_to):
-        account_id = App.get_running_app().root.account_id
-        db_manager = DatabaseManager()
-        report = BalanceReport.BalanceReport()
-        data = report.generate_report_data(account_id, self.group_id, date_from, date_to)
-        expenses = ['Wydatki:']
-        incomes = ['Przychody:']
-        summary = {'expenses': 0, 'incomes': 0}
-        for item in data:
-            category_name = db_manager.get_category(item)['name']
-
-            if data[item][0] == 1:
-                expenses.append(f'{category_name}: {data[item][1]} zł.')
-                summary['expenses'] = summary['expenses'] + data[item][1]
-            elif data[item][0] == 2:
-                incomes.append(f'{category_name}: {data[item][1]} zł.')
-                summary['incomes'] = summary['incomes'] + data[item][1]
-
-        report_data = {'expenses': expenses, 'incomes': incomes, 'summary': summary}
-        return report_data
-
-
-class PaymentMethodReportScreen(ReportScreen):
-    report_name = 'Raport metod płatności'
-
-    def print_report(self, date_from_field, date_to_field):
-        box = self.ids.box
-        self.ids.box.clear_widgets()
-        date_from = date_from_field.text
-        date_to = date_to_field.text
-
-        if self.validate_input(date_from, date_to):
-            date_from = datetime.datetime.strptime(date_from, '%d.%m.%Y')
-            date_to = datetime.datetime.strptime(date_to, '%d.%m.%Y')
-
-            report_data = self.generate_report(date_from, date_to)
-
-            for item in report_data:
-                box.add_widget(CenteredLabel(text=item))
-            self.show_message('')
-
-    def generate_report(self, date_from, date_to):
-        account_id = App.get_running_app().root.account_id
-        db_manager = DatabaseManager()
-        report = PaymentMethodReport.PaymentMethodReport()
-        data = report.generate_report_data(account_id, self.group_id, date_from, date_to)
-        report_lines = []
-        for user in data:
-            user_name = db_manager.get_user(user)['username']
-            report_lines.append(f'Użytkownik: {user_name}')
-            for payment_method in data[user]:
-                payment_method_name = db_manager.get_payment_method(payment_method)['name']
-
-                report_lines.append(f'{payment_method_name} | kwota: {data[user][payment_method]} zł.')
-
-        report_data = report_lines
+        report_data = {'results': [], 'summary': ''}
+        if isinstance(self.report, (BalanceReport.BalanceReport,
+                                    SettlementReport.SettlementReport,
+                                    PaymentMethodReport.PaymentMethodReport)):
+            report_data = self.report.prepare_report(
+                self.report.generate_report_data(account_id, self.group_id, date_from, date_to))
         return report_data

@@ -226,7 +226,7 @@ class DatabaseManager:
             )
         return results
 
-    def get_all_expenses(self, account_id, order_by='e.operationDate, c.name, e.name'):
+    def get_all_expenses(self, account_id, order_by='e.operationDate DESC'):
         data = self.__select_all_expenses(account_id, order_by)
         results = []
         for row in data:
@@ -251,7 +251,7 @@ class DatabaseManager:
         return results
 
     def get_all_expenses_between_dates(self, account_id, date_from=None,
-                                       date_to=None, order_by='e.operationDate, c.name, e.name'):
+                                       date_to=None, order_by='e.operationDate DESC'):
         data = self.__select_all_expenses_between_dates(account_id, date_from, date_to, order_by)
         results = []
         for row in data:
@@ -275,7 +275,7 @@ class DatabaseManager:
             )
         return results
 
-    def get_all_incomes(self, account_id, order_by='i.operationDate, c.name, i.name'):
+    def get_all_incomes(self, account_id, order_by='i.operationDate DESC'):
         data = self.__select_all_incomes(account_id, order_by)
         results = []
         for row in data:
@@ -296,7 +296,7 @@ class DatabaseManager:
         return results
 
     def get_all_incomes_between_dates(self, account_id, date_from=None,
-                                      date_to=None, order_by='i.operationDate, c.name, i.name'):
+                                      date_to=None, order_by='i.operationDate DESC'):
         data = self.__select_all_incomes_between_dates(account_id, date_from, date_to, order_by)
         results = []
         for row in data:
@@ -915,7 +915,7 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __select_all_expenses(self, account_id, order_by='e.operationDate, c.name, e.name'):
+    def __select_all_expenses(self, account_id, order_by='e.operationDate, c.name, e.name ASC'):
         sql = ('SELECT '
                'e.expenseId, '
                'e.operationDate, '
@@ -954,7 +954,7 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_expenses_between_dates(self, account_id, date_from=None,
-                                            date_to=None, order_by='e.operationDate, c.name, e.name'):
+                                            date_to=None, order_by='e.operationDate, c.name, e.name ASC'):
         if date_from is None:
             date_from = datetime(1000, 1, 1)
         else:
@@ -1002,7 +1002,7 @@ class DatabaseManager:
         finally:
             self.close_connection()
 
-    def __select_all_incomes(self, account_id, order_by='i.operationDate, c.name, i.name'):
+    def __select_all_incomes(self, account_id, order_by='i.operationDate, c.name, i.name ASC'):
         sql = ('SELECT '
                'i.incomeId, '
                'i.operationDate, '
@@ -1033,7 +1033,7 @@ class DatabaseManager:
             self.close_connection()
 
     def __select_all_incomes_between_dates(self, account_id, date_from=None,
-                                           date_to=None, order_by='i.operationDate, c.name, i.name'):
+                                           date_to=None, order_by='i.operationDate, c.name, i.name ASC'):
         if date_from is None:
             date_from = datetime(1000, 1, 1)
         else:

@@ -1,15 +1,18 @@
 <ReportScreen>:
-    name: 'Raport'
+    name: 'report_screen'
     VerticalBoxLayout:
         CenteredLabel:
             id: report_name
-            text: 'Raport'
-        CenteredTextField:
+            text: 'Panel raportów'
+        CenteredButton:
+            text: "Wybierz zakres dat"
+            on_release: root.show_datepicker()
+        CenteredLabel:
             id: date_from
-            hint_text: 'Początkowa data'
-        CenteredTextField:
+            text: 'Początkowa data: ' + root.date_from
+        CenteredLabel:
             id: date_to
-            hint_text: 'Końcowa data'
+            text: 'Końcowa data: ' + root.date_to
         HorizontalBoxLayout:
             CenteredLabel:
                 text: 'Grupa:'
@@ -17,12 +20,18 @@
                 id: groups_btn
                 text: 'Wybierz'
         HorizontalBoxLayout:
+            CenteredLabel:
+                text: 'Raport:'
+            ButtonWithData:
+                id: reports_btn
+                text: 'Wybierz'
+        HorizontalBoxLayout:
             Button:
                 text: 'Powrót'
-                on_release: app.root.current = 'reports_list_screen'
+                on_release: app.root.current = 'menu_screen'
             Button:
                 text: 'Generuj raport'
-                on_release: root.print_report(date_from, date_to)
+                on_release: root.print_report()
         Widget:
             size_hint_y: 0.5
         ScrollView:
@@ -30,7 +39,6 @@
             GridLayout:
                 spacing: 5
                 cols: 1
-                orientation: 'vertical'
                 col_default_width: self.width
                 row_default_height: 20
                 size_hint_y:None
@@ -41,12 +49,3 @@
         Widget:
         CenteredErrorLabel:
             id: message
-
-<BalanceReportScreen>:
-    name: 'balance_report_screen'
-
-<SettlementReportScreen>:
-    name: 'settlement_report_screen'
-
-<PaymentMethodReportScreen>:
-    name: 'payment_method_report_screen'

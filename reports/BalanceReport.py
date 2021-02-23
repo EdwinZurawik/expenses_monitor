@@ -3,6 +3,8 @@ from database_manager.DatabaseManager import DatabaseManager
 
 class BalanceReport:
     manager = DatabaseManager()
+    name = 'Raport bilansu'
+    id = 1
 
     def get_data_from_db(self, account_id, report_group_id, date_from, date_to):
         operations_list = self.manager.get_all_expenses_between_dates(account_id, date_from, date_to)
@@ -59,6 +61,34 @@ class BalanceReport:
         for k, v in categories.items():
             v[1] = round(v[1], 2)
         return categories
+
+    def prepare_report(self, data):
+
+        expenses = ['Wydatki:']
+        incomes = ['Przychody:']
+        summary = {'expenses': 0, 'incomes': 0}
+        for item in data:
+            category_name = self.manager.get_category(item)['name']
+
+            if data[item][0] == 1:
+                expenses.append(f'{category_name}: {data[item][1]} zł.')
+                summary['expenses'] = summary['expenses'] + data[item][1]
+            elif data[item][0] == 2:
+                incomes.append(f'{category_name}: {data[item][1]} zł.')
+                summary['incomes'] = summary['incomes'] + data[item][1]
+
+        results = []
+        results.extend(expenses)
+        results.extend(incomes)
+
+        balance = summary["incomes"] - summary["expenses"]
+
+        summary_text = f'Wydatki: {summary["expenses"]} zł ' \
+                       f'| Przychody: {summary["incomes"]} zł ' \
+                       f'| Bilans: {balance} zł.'
+
+        report_data = {'results': results, 'summary': summary_text}
+        return report_data
 
     def calculate_by_percent(self, user_id, group, amount):  # for expenses and incomes
         balance = 0
